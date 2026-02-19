@@ -1,0 +1,129 @@
+{
+  "app": {
+    "name": "Running Coach",
+    "version": "1.0.0",
+    "environment": "development",
+    "description": "AI-powered running coach with multi-agent analysis"
+  },
+  "api": {
+    "port": 3000,
+    "host": "localhost",
+    "baseUrl": "/api/v1",
+    "cors": {
+      "enabled": true,
+      "origins": [
+        "http://localhost:5173",
+        "http://localhost:3000"
+      ],
+      "credentials": true
+    },
+    "rateLimit": {
+      "windowMs": 900000,
+      "maxRequests": 100
+    },
+    "timeout": 30000
+  },
+  "agentService": {
+    "host": "localhost",
+    "port": 5001,
+    "protocol": "http",
+    "endpoints": {
+      "analyze": "/analyze",
+      "generatePlan": "/generate-plan",
+      "health": "/health"
+    },
+    "timeout": 60000,
+    "retries": 3
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "./database/running_coach.db",
+    "options": {
+      "busyTimeout": 5000,
+      "enableWAL": true
+    },
+    "backup": {
+      "enabled": true,
+      "interval": "daily",
+      "retention": 7
+    }
+  },
+  "mcp": {
+    "garmin": {
+      "name": "garmin-mcp",
+      "command": "/Users/anupk/devops/mcp/garmin_mcp/.venv/bin/python",
+      "args": [
+        "/Users/anupk/devops/mcp/garmin_mcp/garmin_mcp_server.py"
+      ],
+      "timeout": 30000,
+      "retries": 3,
+      "healthCheck": {
+        "enabled": true,
+        "interval": 60000
+      }
+    }
+  },
+  "llm": {
+    "provider": "openai",
+    "watsonx": {
+      "apiUrl": "${WATSONX_API_URL}",
+      "projectId": "${WATSONX_PROJECT_ID}",
+      "apiKey": "${WATSONX_API_KEY}",
+      "model": "openai/gpt-oss-120b",
+      "temperature": 0.3,
+      "maxTokens": 2500
+    },
+    "openai": {
+      "apiKey": "${OPENAI_API_KEY}",
+      "model": "gpt-4o-mini",
+      "temperature": 0.3,
+      "maxTokens": 2500
+    }
+  },
+  "security": {
+    "tokenEncryption": {
+      "enabled": true,
+      "algorithm": "aes-256-gcm",
+      "keyDerivation": "pbkdf2"
+    },
+    "session": {
+      "secret": "${SESSION_SECRET}",
+      "maxAge": 86400000,
+      "secure": false,
+      "httpOnly": true
+    },
+    "dataPrivacy": {
+      "enableExport": true,
+      "enableDeletion": true,
+      "retentionDays": 365
+    }
+  },
+  "observability": {
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "destination": "./logs",
+      "rotation": {
+        "enabled": true,
+        "maxSize": "10m",
+        "maxFiles": 10
+      }
+    },
+    "tracking": {
+      "promptVersions": true,
+      "modelVersions": true,
+      "dataQuality": true,
+      "performance": true
+    },
+    "metrics": {
+      "enabled": true,
+      "interval": 60000,
+      "endpoint": "/metrics"
+    }
+  },
+  "features": {
+    "autoSync": false,
+    "weeklyAdaptation": false,
+    "multiSport": false
+  }
+}

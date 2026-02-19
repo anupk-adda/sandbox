@@ -1,0 +1,106 @@
+
+> running-coach-backend@1.0.0 start
+> node dist/server.js
+
+[dotenv@17.3.1] injecting env (7) from ../config/.env -- tip: ⚙️  enable debug logging with { debug: true }
+01:23:54 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
+01:23:54 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
+01:23:54 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
+01:23:54 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
+01:23:54 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
+01:23:54 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
+01:23:54 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏃 Running Coach Backend API
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  URL:         http://localhost:3000
+  Health:      http://localhost:3000/health
+  Environment: development
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+01:23:55 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
+01:23:55 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
+01:25:11 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
+01:25:11 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
+01:25:18 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
+01:25:18 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
+01:25:18 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+01:25:18 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+01:25:18 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
+01:25:18 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
+01:25:21 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/chat","ip":"::1"}
+01:25:21 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/chat","ip":"::1"}
+01:25:21 [[32minfo[39m]: Chat POST handler called {"service":"running-coach-backend","body":{"message":"Running conditions near me","location":{"latitude":1.3402546959834565,"longitude":103.95618847137929}}}
+01:25:21 [[32minfo[39m]: Chat POST handler called {"service":"running-coach-backend","body":{"message":"Running conditions near me","location":{"latitude":1.3402546959834565,"longitude":103.95618847137929}}}
+01:25:21 [[32minfo[39m]: Calling agent service: analyze fitness trend {"service":"running-coach-backend"}
+01:25:21 [[32minfo[39m]: Calling agent service: analyze fitness trend {"service":"running-coach-backend"}
+01:25:21 [[32minfo[39m]: Running conditions near me {"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:25:21 [[32minfo[39m]: Running conditions near me {"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:25:21 [[32minfo[39m]: Calling agent service: classify intent {"service":"running-coach-backend"}
+01:25:21 [[32minfo[39m]: Calling agent service: classify intent {"service":"running-coach-backend"}
+01:25:23 [[32minfo[39m]: Intent classified {"service":"running-coach-backend","type":"weather","confidence":0.9,"requiresGarminData":false}
+01:25:23 [[32minfo[39m]: Intent classified {"service":"running-coach-backend","type":"weather","confidence":0.9,"requiresGarminData":false}
+01:25:23 [[32minfo[39m]: Calling agent service: running conditions {"service":"running-coach-backend"}
+01:25:23 [[32minfo[39m]: Calling agent service: running conditions {"service":"running-coach-backend"}
+01:27:08 [[32minfo[39m]: Agent service response received {"service":"running-coach-backend","agent":"FitnessTrendAnalyzer","hasError":false}
+01:27:08 [[32minfo[39m]: Agent service response received {"service":"running-coach-backend","agent":"FitnessTrendAnalyzer","hasError":false}
+01:33:48 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
+01:33:48 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
+01:33:58 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
+01:33:58 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
+01:33:58 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+01:33:58 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+01:33:58 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
+01:33:58 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
+01:34:04 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/chat","ip":"::1"}
+01:34:04 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/chat","ip":"::1"}
+01:34:04 [[32minfo[39m]: Chat POST handler called {"service":"running-coach-backend","body":{"message":"Recommend my next run","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","location":{"latitude":1.3403394167078786,"longitude":103.95613611654656}}}
+01:34:04 [[32minfo[39m]: Chat POST handler called {"service":"running-coach-backend","body":{"message":"Recommend my next run","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","location":{"latitude":1.3403394167078786,"longitude":103.95613611654656}}}
+01:34:04 [[32minfo[39m]: Recommend my next run {"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:34:04 [[32minfo[39m]: Recommend my next run {"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:34:04 [[32minfo[39m]: Calling agent service: classify intent {"service":"running-coach-backend"}
+01:34:04 [[32minfo[39m]: Calling agent service: classify intent {"service":"running-coach-backend"}
+01:34:05 [[32minfo[39m]: Intent classified {"service":"running-coach-backend","type":"general","confidence":0.8,"requiresGarminData":false}
+01:34:05 [[32minfo[39m]: Intent classified {"service":"running-coach-backend","type":"general","confidence":0.8,"requiresGarminData":false}
+01:34:05 [[32minfo[39m]: Coach routing flags {"service":"running-coach-backend","coachable":true,"personalized":true,"sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:34:05 [[32minfo[39m]: Coach routing flags {"service":"running-coach-backend","coachable":true,"personalized":true,"sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:34:05 [[32minfo[39m]: Routing to Coach Q&A Agent with context {"service":"running-coach-backend"}
+01:34:05 [[32minfo[39m]: Routing to Coach Q&A Agent with context {"service":"running-coach-backend"}
+01:34:05 [[32minfo[39m]: Calling agent service: coach question with context {"service":"running-coach-backend"}
+01:34:05 [[32minfo[39m]: Calling agent service: coach question with context {"service":"running-coach-backend"}
+01:34:11 [[32minfo[39m]: Coach agent response prepared {"service":"running-coach-backend","agent":"Coach Q&A Agent - Context Aware","responseLength":769}
+01:34:11 [[32minfo[39m]: Coach agent response prepared {"service":"running-coach-backend","agent":"Coach Q&A Agent - Context Aware","responseLength":769}
+01:34:34 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/chat","ip":"::1"}
+01:34:34 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/chat","ip":"::1"}
+01:34:34 [[32minfo[39m]: Chat POST handler called {"service":"running-coach-backend","body":{"message":"Analyze my last run","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","location":{"latitude":1.3403394167078786,"longitude":103.95613611654656}}}
+01:34:34 [[32minfo[39m]: Chat POST handler called {"service":"running-coach-backend","body":{"message":"Analyze my last run","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","location":{"latitude":1.3403394167078786,"longitude":103.95613611654656}}}
+01:34:34 [[32minfo[39m]: Analyze my last run {"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:34:34 [[32minfo[39m]: Analyze my last run {"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"}
+01:34:34 [[32minfo[39m]: Calling agent service: classify intent {"service":"running-coach-backend"}
+01:34:34 [[32minfo[39m]: Calling agent service: classify intent {"service":"running-coach-backend"}
+01:34:35 [[32minfo[39m]: Intent classified {"service":"running-coach-backend","type":"last_run","confidence":0.9,"requiresGarminData":true}
+01:34:35 [[32minfo[39m]: Intent classified {"service":"running-coach-backend","type":"last_run","confidence":0.9,"requiresGarminData":true}
+01:34:35 [[32minfo[39m]: Routing to Agent 1: Current Run Analyzer {"service":"running-coach-backend"}
+01:34:35 [[32minfo[39m]: Routing to Agent 1: Current Run Analyzer {"service":"running-coach-backend"}
+01:34:35 [[32minfo[39m]: Calling agent service: analyze latest run {"service":"running-coach-backend"}
+01:34:35 [[32minfo[39m]: Calling agent service: analyze latest run {"service":"running-coach-backend"}
+01:35:37 [[32minfo[39m]: Agent service response received {"service":"running-coach-backend","agent":"CurrentRunAnalyzer","hasError":false}
+01:35:37 [[32minfo[39m]: Agent service response received {"service":"running-coach-backend","agent":"CurrentRunAnalyzer","hasError":false}
+01:35:37 [[32minfo[39m]: Chat response prepared {"service":"running-coach-backend","agent":"Agent 1 - Current Run Analyzer","responseLength":1319}
+01:35:37 [[32minfo[39m]: Chat response prepared {"service":"running-coach-backend","agent":"Agent 1 - Current Run Analyzer","responseLength":1319}
+01:35:48 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/subscription-status","ip":"::1"}
+01:35:48 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/subscription-status","ip":"::1"}
+01:35:48 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
+01:35:48 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
+01:36:42 [[32minfo[39m]: SIGTERM received, shutting down gracefully {"service":"running-coach-backend"}
+01:36:42 [[32minfo[39m]: SIGTERM received, shutting down gracefully {"service":"running-coach-backend"}
+01:36:42 [[32minfo[39m]: Database connection closed {"service":"running-coach-backend"}
+01:36:42 [[32minfo[39m]: Database connection closed {"service":"running-coach-backend"}

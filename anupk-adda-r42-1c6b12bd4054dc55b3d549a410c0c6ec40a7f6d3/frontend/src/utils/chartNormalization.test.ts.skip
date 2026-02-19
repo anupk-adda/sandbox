@@ -1,0 +1,160 @@
+/**
+ * Chart Normalization Tests
+ * Unit tests for normalization utilities
+ */
+
+import { describe, it, expect } from 'vitest';
+import {
+  normalizeData,
+  createNormalizedSeries,
+  formatValue,
+  clamp,
+  buildPath,
+} from './chartNormalization';
+
+describe('normalizeData', () => {
+  it('should normalize regular metrics to 0-100 scale', () => {
+    const data = [10, 20, 30, 40, 50];
+    const result = normalizeData(data, 'km');
+
+    expect(result.min).toBe(10);
+    expect(result.max).toBe(50);
+    expect(result.normalized).toEqual([0, 25, 50, 75, 100]);
+  });
+
+  it('should invert pace metrics (faster = higher)', () => {
+    const data = [5.0, 5.5, 6.0]; // min/km - lower is faster
+    const result = normalizeData(data, 'min/km');
+
+    expect(result.min).toBe(5.0);
+    expect(result.max).toBe(6.0);
+    // 5.0 is fastest, should be 100
+    // 6.0 is slowest, should be 0
+    expect(result.normalized).toEqual([100, 50, 0]);
+  });
+
+  it('should handle single value (all same)', () => {
+    const data = [42, 42, 42];
+    const result = normalizeData(data, 'bpm');
+
+    expect(result.min).toBe(42);
+    expect(result.max).toBe(42);
+    expect(result.normalized).toEqual([50, 50, 50]);
+  });
+
+  it('should handle empty array', () => {
+    const data: number[] = [];
+    const result = normalizeData(data, 'km');
+
+    expect(result.min).toBe(0);
+    expect(result.max).toBe(0);
+    expect(result.normalized).toEqual([]);
+  });
+
+  it('should handle negative values', () => {
+    const data = [-10, 0, 10];
+    const result = normalizeData(data, 'km');
+
+    expect(result.min).toBe(-10);
+    expect(result.max).toBe(10);
+    expect(result.normalized).toEqual([0, 50, 100]);
+  });
+});
+
+describe('createNormalizedSeries', () => {
+  it('should create a normalized series with all properties', () => {
+    const data = [100, 150, 200];
+    const series = createNormalizedSeries('Heart Rate', data, 'bpm', '#4f46e5');
+
+    expect(series.label).toBe('Heart Rate');
+    expect(series.unit).toBe('bpm');
+    expect(series.color).toBe('#4f46e5');
+    expect(series.rawData).toEqual(data);
+    expect(series.min).toBe(100);
+    expect(series.max).toBe(200);
+    expect(series.data).toEqual([0, 50, 100]);
+  });
+
+  it('should handle pace data with inversion', () => {
+    const data = [5.0, 5.5, 6.0];
+    const series = createNormalizedSeries('Pace', data, 'min/km', '#f97316');
+
+    expect(series.data).toEqual([100, 50, 0]);
+    expect(series.rawData).toEqual(data);
+  });
+});
+
+describe('formatValue', () => {
+  it('should format pace as MM:SS', () => {
+    expect(formatValue(5.5, 'min/km')).toBe('5:30');
+    expect(formatValue(6.25, 'min/km')).toBe('6:15');
+    expect(formatValue(4.0, 'min/km')).toBe('4:00');
+  });
+
+  it('should format distance with 1 decimal', () => {
+    expect(formatValue(10.5, 'km')).toBe('10.5');
+    expect(formatValue(5.0, 'km')).toBe('5.0');
+  });
+
+  it('should format heart rate as integer', () => {
+    expect(formatValue(145.7, 'bpm')).toBe('146');
+    expect(formatValue(120.2, 'bpm')).toBe('120');
+  });
+
+  it('should format cadence as integer', () => {
+    expect(formatValue(180.5, 'spm')).toBe('181');
+    expect(formatValue(170.2, 'spm')).toBe('170');
+  });
+
+  it('should format other metrics as integer', () => {
+    expect(formatValue(42.7, 'other')).toBe('43');
+    expect(formatValue(100.1, 'watts')).toBe('100');
+  });
+
+  it('should handle non-finite values', () => {
+    expect(formatValue(NaN, 'km')).toBe('');
+    expect(formatValue(Infinity, 'bpm')).toBe('');
+  });
+});
+
+describe('clamp', () => {
+  it('should clamp values within range', () => {
+    expect(clamp(5, 0, 10)).toBe(5);
+    expect(clamp(-5, 0, 10)).toBe(0);
+    expect(clamp(15, 0, 10)).toBe(10);
+  });
+
+  it('should handle edge cases', () => {
+    expect(clamp(0, 0, 10)).toBe(0);
+    expect(clamp(10, 0, 10)).toBe(10);
+  });
+});
+
+describe('buildPath', () => {
+  it('should build SVG path from points', () => {
+    const points = [
+      { x: 0, y: 100 },
+      { x: 50, y: 50 },
+      { x: 100, y: 0 },
+    ];
+    const path = buildPath(points);
+
+    expect(path).toBe(' M 0 100 L 50 50 L 100 0');
+  });
+
+  it('should handle single point', () => {
+    const points = [{ x: 50, y: 50 }];
+    const path = buildPath(points);
+
+    expect(path).toBe(' M 50 50');
+  });
+
+  it('should handle empty array', () => {
+    const points: Array<{ x: number; y: number }> = [];
+    const path = buildPath(points);
+
+    expect(path).toBe('');
+  });
+});
+
+// Made with Bob

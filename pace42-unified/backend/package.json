@@ -1,0 +1,17 @@
+{
+  "name": "pace42-backend",
+  "version": "1.0.0",
+  "description": "pace42 Backend API with Auth and Agent Integration",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": ["running", "ai", "coach", "garmin"],
+  "author": "pace42",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

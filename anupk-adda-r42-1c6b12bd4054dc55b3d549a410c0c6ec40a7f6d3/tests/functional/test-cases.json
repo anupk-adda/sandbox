@@ -1,0 +1,128 @@
+{
+  "base_url_env": "BASE_URL",
+  "default_base_url": "http://localhost:3000",
+  "cases": [
+    {
+      "id": "health",
+      "name": "Backend health check",
+      "method": "GET",
+      "path": "/health",
+      "asserts": [
+        { "type": "status", "equals": 200 },
+        { "type": "json_equals", "path": "status", "equals": "ok" }
+      ]
+    },
+    {
+      "id": "weather",
+      "name": "Running conditions with location",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "body": {
+        "message": "Running conditions near me",
+        "location": { "latitude": 1.3521, "longitude": 103.8198 }
+      },
+      "asserts": [
+        { "type": "status", "equals": 200 },
+        { "type": "json_exists", "path": "weather" },
+        { "type": "json_len_gte", "path": "weather.hours", "value": 6 }
+      ]
+    },
+    {
+      "id": "non_running",
+      "name": "Non-running intent gets polite redirect",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "body": { "message": "tell me a joke" },
+      "asserts": [
+        { "type": "status", "equals": 200 },
+        { "type": "json_contains", "path": "response", "value": "running coaching" }
+      ]
+    },
+    {
+      "id": "followup_temp_run",
+      "name": "Follow-up short reply should stay in running context",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "steps": [
+        {
+          "body": { "message": "Recommend my next run" },
+          "asserts": [
+            { "type": "status", "equals": 200 }
+          ]
+        },
+        {
+          "body": { "message": "so a temp run" },
+          "asserts": [
+            { "type": "status", "equals": 200 },
+            { "type": "json_equals", "path": "intent", "equals": "general" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "followup_injury",
+      "name": "Training follow-up should not be non_running",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "steps": [
+        {
+          "body": { "message": "I’m training for a 5k in 25 min" },
+          "asserts": [
+            { "type": "status", "equals": 200 }
+          ]
+        },
+        {
+          "body": { "message": "no major injury" },
+          "asserts": [
+            { "type": "status", "equals": 200 },
+            { "type": "json_equals", "path": "intent", "equals": "general" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "followup_distance",
+      "name": "Short distance follow-up should stay in running context",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "steps": [
+        {
+          "body": { "message": "what should be my easy run pace" },
+          "asserts": [
+            { "type": "status", "equals": 200 }
+          ]
+        },
+        {
+          "body": { "message": "10k" },
+          "asserts": [
+            { "type": "status", "equals": 200 },
+            { "type": "json_equals", "path": "intent", "equals": "general" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "typo_fartlake",
+      "name": "Typo normalization for fartlek",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "body": { "message": "what is a fartlake run" },
+      "asserts": [
+        { "type": "status", "equals": 200 },
+        { "type": "json_equals", "path": "intent", "equals": "general" }
+      ]
+    },
+    {
+      "id": "charts_last_run",
+      "name": "Analyze last run returns charts",
+      "method": "POST",
+      "path": "/api/v1/chat",
+      "body": { "message": "Analyze my last run" },
+      "requires_env": "RUN_GARMIN_TESTS",
+      "asserts": [
+        { "type": "status", "equals": 200 },
+        { "type": "json_len_gte", "path": "charts", "value": 1 }
+      ]
+    }
+  ]
+}

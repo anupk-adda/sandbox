@@ -1,0 +1,390 @@
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Auth routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Database schema initialized","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-19 23:49:50","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-19 23:49:50"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"running-coach-backend","timestamp":"2026-02-19 23:50:20"}
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"level":"info","message":"Database schema initialized","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:01:53"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-20 00:01:53","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:01:54"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:04:53"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/signup","service":"running-coach-backend","timestamp":"2026-02-20 00:05:02"}
+{"level":"info","message":"User signed up","service":"running-coach-backend","timestamp":"2026-02-20 00:05:02","userId":"e0c74187-a64a-4b79-9d1c-4f7e19040392","username":"testuser"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:05:06"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:05:06","userId":"e0c74187-a64a-4b79-9d1c-4f7e19040392","username":"testuser"}
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-20 00:07:16"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:07:16"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:07:16"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-20 00:07:16"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-20 00:07:16"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:07:16"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-20 00:07:16","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:07:17"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:10:19"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:15:03"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/signup","service":"running-coach-backend","timestamp":"2026-02-20 00:15:14"}
+{"level":"info","message":"User signed up","service":"running-coach-backend","timestamp":"2026-02-20 00:15:14","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/validate-garmin","service":"running-coach-backend","timestamp":"2026-02-20 00:15:31"}
+{"garminUsername":"anup.kumar.gupta@gmail.com","level":"info","message":"Garmin credentials validated","service":"running-coach-backend","timestamp":"2026-02-20 00:15:31","userId":"2548431b-242e-42a6-9c44-38f1798b56ad"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:15:31"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:15:31"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:15:39"}
+{"body":{"location":{"latitude":1.3403210476205354,"longitude":103.95628293341292},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:15:39"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:15:39"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"849d9e10-8924-4490-a817-559fe4ebf2b0","timestamp":"2026-02-20 00:15:39"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:15:39"}
+{"confidence":0.6,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:15:40","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:15:40"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:15:49"}
+{"body":{"location":{"latitude":1.3403210476205354,"longitude":103.95628293341292},"message":"Analyze my last run","sessionId":"849d9e10-8924-4490-a817-559fe4ebf2b0"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:15:49"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:15:49"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"849d9e10-8924-4490-a817-559fe4ebf2b0","timestamp":"2026-02-20 00:15:49"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:15:49"}
+{"confidence":0.6,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 00:15:49","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 00:15:49"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 00:15:49"}
+{"agent":"CurrentRunAnalyzer","hasError":true,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:16:33"}
+{"error":"Error code: 401 - {'error': {'message': 'Incorrect API key provided: your-ope************here. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}","level":"error","message":"Agent returned error","service":"running-coach-backend","timestamp":"2026-02-20 00:16:33"}
+{"error":{},"level":"error","message":"Error calling agent service","service":"running-coach-backend","timestamp":"2026-02-20 00:17:05"}
+{"error":{},"level":"warn","message":"PersonaAgent: failed to refresh runner history","service":"running-coach-backend","timestamp":"2026-02-20 00:17:05"}
+{"error":{},"level":"error","message":"Error calling agent service","service":"running-coach-backend","timestamp":"2026-02-20 00:17:13"}
+{"error":{},"level":"warn","message":"PersonaAgent: failed to refresh runner history","service":"running-coach-backend","timestamp":"2026-02-20 00:17:13"}
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-20 00:20:31","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:20:31"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:23:32"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:27:15"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:27:20"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:27:20","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:27:20"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:27:20"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:27:28"}
+{"body":{"location":{"latitude":1.3402493774778268,"longitude":103.956247892592},"message":"Analyze my last run"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:27:28"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:27:28"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:27:28"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:27:28"}
+{"confidence":1,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 00:27:30","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 00:27:30"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 00:27:30"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:28:29"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1443,"service":"running-coach-backend","timestamp":"2026-02-20 00:28:29"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:29:21"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:29:40"}
+{"body":{"location":{"latitude":1.3402493774778268,"longitude":103.956247892592},"message":"Running conditions near me","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:29:40"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:29:40"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:29:40"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:29:42","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:29:42"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:30:26"}
+{"body":{"location":{"latitude":1.3402493774778268,"longitude":103.956247892592},"message":"Recommend my next run","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:30:26"}
+{"level":"info","message":"Recommend my next run","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:30:26"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:30:26"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 00:30:29","type":"recent_runs"}
+{"level":"info","message":"Routing to Agent 2: Last Runs Comparator","service":"running-coach-backend","timestamp":"2026-02-20 00:30:29"}
+{"level":"info","message":"Calling agent service: analyze recent runs","service":"running-coach-backend","timestamp":"2026-02-20 00:30:29"}
+{"agent":"LastRunsComparator","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:31:11"}
+{"agent":"Agent 2 - Last Runs Comparator","level":"info","message":"Chat response prepared","responseLength":1940,"service":"running-coach-backend","timestamp":"2026-02-20 00:31:11"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:31:22"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:31:22","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:31:23"}
+{"body":{"location":{"latitude":1.34,"longitude":103.95},"message":"Analyze my last run"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:31:23"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:31:23"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"aabc483f-f1a8-4fb5-9647-d828f8e99487","timestamp":"2026-02-20 00:31:23"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:31:23"}
+{"confidence":1,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 00:31:25","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 00:31:25"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 00:31:25"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:32:02"}
+{"body":{"location":{"latitude":1.3402493774778268,"longitude":103.956247892592},"message":"Running conditions near me","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:32:02"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:32:02"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:32:02"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:32:05","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:32:05"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:32:28"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1429,"service":"running-coach-backend","timestamp":"2026-02-20 00:32:28"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:33:05"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:34:06"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:34:06","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:34:14"}
+{"body":{"location":{"latitude":1.34,"longitude":103.95},"message":"Analyze my last run"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:34:14"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:34:14"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"5daac00a-ea24-4ec7-b2f9-3fc7dd762fcf","timestamp":"2026-02-20 00:34:14"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:34:14"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 00:34:16","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 00:34:16"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 00:34:16"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:34:43"}
+{"body":{"location":{"latitude":1.3402493774778268,"longitude":103.956247892592},"message":"Analyze my running progress","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:34:43"}
+{"level":"info","message":"Analyze my running progress","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:34:43"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:34:43"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:34:44","type":"fitness_trend"}
+{"coachable":false,"level":"info","message":"Coach routing flags","personalized":true,"service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:34:44"}
+{"level":"info","message":"Routing to Coach Q&A Agent with context","service":"running-coach-backend","timestamp":"2026-02-20 00:34:44"}
+{"level":"info","message":"Calling agent service: coach question with context","service":"running-coach-backend","timestamp":"2026-02-20 00:34:44"}
+{"agent":"Coach Q&A Agent - Context Aware","level":"info","message":"Coach agent response prepared","responseLength":1999,"service":"running-coach-backend","timestamp":"2026-02-20 00:34:53"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:35:10"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1382,"service":"running-coach-backend","timestamp":"2026-02-20 00:35:10"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:36:04"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:36:07"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:36:14"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:36:14","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:36:14"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:36:14"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:36:46"}
+{"body":{"location":{"latitude":1.340261888170125,"longitude":103.95614603272041},"message":"create a half marathon plan","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:36:46"}
+{"level":"info","message":"create a half marathon plan","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:36:46"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:36:46"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:37:10"}
+{"body":{"location":{"latitude":1.340261888170125,"longitude":103.95614603272041},"message":"2026-05-05 , 3 days a week","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:37:10"}
+{"level":"info","message":"2026-05-05 , 3 days a week","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:37:10"}
+{"level":"info","message":"Calling agent service: generate plan","service":"running-coach-backend","timestamp":"2026-02-20 00:37:10"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:38:13"}
+{"body":{"location":{"latitude":1.340261888170125,"longitude":103.95614603272041},"message":"subscribe","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:38:13"}
+{"level":"info","message":"subscribe","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:38:13"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:38:39"}
+{"body":{"location":{"latitude":1.340261888170125,"longitude":103.95614603272041},"message":"show my progress","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:38:39"}
+{"level":"info","message":"show my progress","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:38:39"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:38:39"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:38:41","type":"fitness_trend"}
+{"coachable":false,"level":"info","message":"Coach routing flags","personalized":true,"service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:38:41"}
+{"level":"info","message":"Routing to Coach Q&A Agent with context","service":"running-coach-backend","timestamp":"2026-02-20 00:38:41"}
+{"level":"info","message":"Calling agent service: coach question with context","service":"running-coach-backend","timestamp":"2026-02-20 00:38:41"}
+{"agent":"Coach Q&A Agent - Context Aware","level":"info","message":"Coach agent response prepared","responseLength":1384,"service":"running-coach-backend","timestamp":"2026-02-20 00:38:47"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:38:54"}
+{"body":{"location":{"latitude":1.340261888170125,"longitude":103.95614603272041},"message":"show my running plan","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:38:54"}
+{"level":"info","message":"show my running plan","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:38:54"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:38:54"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:38:55","type":"training_plan"}
+{"coachable":false,"level":"info","message":"Coach routing flags","personalized":true,"service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:38:55"}
+{"level":"info","message":"Routing to Coach Q&A Agent with context","service":"running-coach-backend","timestamp":"2026-02-20 00:38:55"}
+{"level":"info","message":"Calling agent service: coach question with context","service":"running-coach-backend","timestamp":"2026-02-20 00:38:55"}
+{"agent":"Coach Q&A Agent - Context Aware","level":"info","message":"Coach agent response prepared","responseLength":1496,"service":"running-coach-backend","timestamp":"2026-02-20 00:39:05"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:39:22"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:39:30"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:39:30","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:39:30"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:39:30"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:39:43"}
+{"body":{"location":{"latitude":1.3402371226115022,"longitude":103.95610788680136},"message":"Running conditions near me","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:39:43"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"baef7ec5-0fac-4add-aeb2-e43ab99d095f","timestamp":"2026-02-20 00:39:43"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:39:43"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:39:44","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:39:44"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:40:45"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:41:38"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:41:43"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:41:43","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:41:43"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:41:43"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:41:56"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:42:01"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:42:01","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:42:01"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:42:01"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:42:07"}
+{"body":{"location":{"latitude":1.3402374865360076,"longitude":103.95604344856332},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:42:07"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:42:07"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"57edee2e-dc24-435d-977a-ef2517bbd19b","timestamp":"2026-02-20 00:42:07"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:42:07"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:42:08","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:42:08"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:42:23"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:42:33"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:42:36"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 00:42:39"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 00:42:39","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:42:39"}
+{"level":"info","message":"404 handler reached","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 00:42:39"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:42:43"}
+{"body":{"location":{"latitude":1.3402374802221622,"longitude":103.95604342678017},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:42:43"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:42:43"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727","timestamp":"2026-02-20 00:42:43"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:42:43"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:42:45","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:42:45"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:43:05"}
+{"body":{"location":{"latitude":1.3402374802221622,"longitude":103.95604342678017},"message":"Analyze my last run","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:43:05"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 00:43:05"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727","timestamp":"2026-02-20 00:43:05"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:43:05"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 00:43:06","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 00:43:06"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 00:43:06"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:44:02"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1310,"service":"running-coach-backend","timestamp":"2026-02-20 00:44:02"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:44:03"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:44:39"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 00:44:58"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:45:07"}
+{"body":{"location":{"latitude":1.3402374802221622,"longitude":103.95604342678017},"message":"Running conditions near me","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:45:07"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727","timestamp":"2026-02-20 00:45:07"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:45:07"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:45:08","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 00:45:08"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:45:46"}
+{"body":{"location":{"latitude":1.3402374802221622,"longitude":103.95604342678017},"message":"what is Te control","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 00:45:46"}
+{"level":"info","message":"what is Te control","service":"running-coach-backend","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727","timestamp":"2026-02-20 00:45:46"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 00:45:46"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 00:45:48","type":"non_running"}
+{"confidence":0.9,"level":"info","message":"Overriding intent to follow-up running context","service":"running-coach-backend","timestamp":"2026-02-20 00:45:48","type":"general"}
+{"coachable":false,"level":"info","message":"Coach routing flags","personalized":true,"service":"running-coach-backend","sessionId":"c3aeb20e-6985-41af-9c0c-9184883bb727","timestamp":"2026-02-20 00:45:48"}
+{"level":"info","message":"Routing to Coach Q&A Agent with context","service":"running-coach-backend","timestamp":"2026-02-20 00:45:48"}
+{"level":"info","message":"Calling agent service: coach question with context","service":"running-coach-backend","timestamp":"2026-02-20 00:45:48"}
+{"agent":"Coach Q&A Agent - Context Aware","level":"info","message":"Coach agent response prepared","responseLength":179,"service":"running-coach-backend","timestamp":"2026-02-20 00:45:49"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:50:00"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully","service":"running-coach-backend","timestamp":"2026-02-20 00:59:24"}
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-20 00:59:34"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 00:59:34"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:59:34"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-20 00:59:34"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-20 00:59:34"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-20 00:59:34"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-20 00:59:34","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 00:59:35"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:04:27"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:04:34"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:04:40"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:04:43"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/signup","service":"running-coach-backend","timestamp":"2026-02-20 01:04:57"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:05:16"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:07:40"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 01:07:40","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/validate-garmin","service":"running-coach-backend","timestamp":"2026-02-20 01:08:02"}
+{"garminUsername":"anup.kumar.gupta@gmail.com","level":"info","message":"Garmin credentials validated","service":"running-coach-backend","timestamp":"2026-02-20 01:08:02","userId":"2548431b-242e-42a6-9c44-38f1798b56ad"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:08:02"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:08:07"}
+{"body":{"location":{"latitude":1.3403389818909677,"longitude":103.9562530090146},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:08:07"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 01:08:07"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"2a83a911-8f3d-4fbb-9ace-195c20d4ef11","timestamp":"2026-02-20 01:08:07"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:08:07"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 01:08:08","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 01:08:08"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:09:10"}
+{"body":{"location":{"latitude":1.3403389818909677,"longitude":103.9562530090146},"message":"Analyze my last run","sessionId":"2a83a911-8f3d-4fbb-9ace-195c20d4ef11"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:09:10"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 01:09:10"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"2a83a911-8f3d-4fbb-9ace-195c20d4ef11","timestamp":"2026-02-20 01:09:10"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:09:10"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 01:09:15","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 01:09:15"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 01:09:15"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:09:58"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:10:07"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1443,"service":"running-coach-backend","timestamp":"2026-02-20 01:10:07"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:11:01"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:14:24"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:14:33"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 01:14:33","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:14:33"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:14:36"}
+{"body":{"location":{"latitude":1.3404164310745077,"longitude":103.95603941544316},"message":"Running conditions near me","sessionId":"2a83a911-8f3d-4fbb-9ace-195c20d4ef11"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:14:36"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"2a83a911-8f3d-4fbb-9ace-195c20d4ef11","timestamp":"2026-02-20 01:14:36"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:14:36"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 01:14:38","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 01:14:38"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully","service":"running-coach-backend","timestamp":"2026-02-20 01:16:59"}
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-20 01:17:00"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:17:00"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-20 01:17:00"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-20 01:17:00"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-20 01:17:00"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-20 01:17:00"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-20 01:17:00","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:17:11"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:18:03"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:18:31"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:18:37"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 01:18:38","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:18:38"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:18:40"}
+{"body":{"location":{"latitude":1.340231120966587,"longitude":103.95601211168085},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:18:40"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 01:18:40"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"1d6b1dc6-d3b7-4d4e-a9a2-e773b908b5cf","timestamp":"2026-02-20 01:18:40"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:18:40"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 01:18:42","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 01:18:42"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:20:28"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:21:34"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:21:41"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 01:21:41","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:21:41"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:21:44"}
+{"body":{"location":{"latitude":1.3401920278434252,"longitude":103.95619883121225},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:21:44"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 01:21:44"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"941349cc-f2cd-4636-8cd7-70c59e4853d4","timestamp":"2026-02-20 01:21:44"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:21:44"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 01:21:45","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 01:21:45"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:22:00"}
+{"body":{"location":{"latitude":1.3401920278434252,"longitude":103.95619883121225},"message":"Analyze my last run","sessionId":"941349cc-f2cd-4636-8cd7-70c59e4853d4"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:22:00"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 01:22:00"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"941349cc-f2cd-4636-8cd7-70c59e4853d4","timestamp":"2026-02-20 01:22:00"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:22:00"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 01:22:01","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 01:22:01"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 01:22:01"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:22:51"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1342,"service":"running-coach-backend","timestamp":"2026-02-20 01:22:51"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:23:40"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:23:43"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully","service":"running-coach-backend","timestamp":"2026-02-20 01:23:52"}
+{"level":"info","message":"Chat routes module loaded","service":"running-coach-backend","timestamp":"2026-02-20 01:23:54"}
+{"level":"info","message":"Registering chat routes","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:23:54"}
+{"level":"info","message":"Chat routes registered successfully","service":"running-coach-backend","timestamp":"2026-02-20 01:23:54"}
+{"level":"info","message":"Connecting to database...","service":"running-coach-backend","timestamp":"2026-02-20 01:23:54"}
+{"level":"info","message":"Database connected successfully","path":"./database/running_coach.db","service":"running-coach-backend","timestamp":"2026-02-20 01:23:54"}
+{"level":"info","message":"Database connected successfully","service":"running-coach-backend","timestamp":"2026-02-20 01:23:54"}
+{"environment":"development","host":"localhost","level":"info","message":"Server started successfully","port":3000,"service":"running-coach-backend","timestamp":"2026-02-20 01:23:54","url":"http://localhost:3000"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:23:55"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:25:11"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:25:18"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 01:25:18","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:25:18"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:25:21"}
+{"body":{"location":{"latitude":1.3402546959834565,"longitude":103.95618847137929},"message":"Running conditions near me"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:25:21"}
+{"level":"info","message":"Calling agent service: analyze fitness trend","service":"running-coach-backend","timestamp":"2026-02-20 01:25:21"}
+{"level":"info","message":"Running conditions near me","service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","timestamp":"2026-02-20 01:25:21"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:25:21"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 01:25:23","type":"weather"}
+{"level":"info","message":"Calling agent service: running conditions","service":"running-coach-backend","timestamp":"2026-02-20 01:25:23"}
+{"agent":"FitnessTrendAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:27:08"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/health","service":"running-coach-backend","timestamp":"2026-02-20 01:33:48"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/auth/login","service":"running-coach-backend","timestamp":"2026-02-20 01:33:58"}
+{"level":"info","message":"User logged in","service":"running-coach-backend","timestamp":"2026-02-20 01:33:58","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:33:58"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:34:04"}
+{"body":{"location":{"latitude":1.3403394167078786,"longitude":103.95613611654656},"message":"Recommend my next run","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:34:04"}
+{"level":"info","message":"Recommend my next run","service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","timestamp":"2026-02-20 01:34:04"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:34:04"}
+{"confidence":0.8,"level":"info","message":"Intent classified","requiresGarminData":false,"service":"running-coach-backend","timestamp":"2026-02-20 01:34:05","type":"general"}
+{"coachable":true,"level":"info","message":"Coach routing flags","personalized":true,"service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","timestamp":"2026-02-20 01:34:05"}
+{"level":"info","message":"Routing to Coach Q&A Agent with context","service":"running-coach-backend","timestamp":"2026-02-20 01:34:05"}
+{"level":"info","message":"Calling agent service: coach question with context","service":"running-coach-backend","timestamp":"2026-02-20 01:34:05"}
+{"agent":"Coach Q&A Agent - Context Aware","level":"info","message":"Coach agent response prepared","responseLength":769,"service":"running-coach-backend","timestamp":"2026-02-20 01:34:11"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"POST","path":"/api/v1/chat","service":"running-coach-backend","timestamp":"2026-02-20 01:34:34"}
+{"body":{"location":{"latitude":1.3403394167078786,"longitude":103.95613611654656},"message":"Analyze my last run","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192"},"level":"info","message":"Chat POST handler called","service":"running-coach-backend","timestamp":"2026-02-20 01:34:34"}
+{"level":"info","message":"Analyze my last run","service":"running-coach-backend","sessionId":"4fb172cb-b716-4821-980f-2e7f226d4192","timestamp":"2026-02-20 01:34:34"}
+{"level":"info","message":"Calling agent service: classify intent","service":"running-coach-backend","timestamp":"2026-02-20 01:34:34"}
+{"confidence":0.9,"level":"info","message":"Intent classified","requiresGarminData":true,"service":"running-coach-backend","timestamp":"2026-02-20 01:34:35","type":"last_run"}
+{"level":"info","message":"Routing to Agent 1: Current Run Analyzer","service":"running-coach-backend","timestamp":"2026-02-20 01:34:35"}
+{"level":"info","message":"Calling agent service: analyze latest run","service":"running-coach-backend","timestamp":"2026-02-20 01:34:35"}
+{"agent":"CurrentRunAnalyzer","hasError":false,"level":"info","message":"Agent service response received","service":"running-coach-backend","timestamp":"2026-02-20 01:35:37"}
+{"agent":"Agent 1 - Current Run Analyzer","level":"info","message":"Chat response prepared","responseLength":1319,"service":"running-coach-backend","timestamp":"2026-02-20 01:35:37"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/subscription-status","service":"running-coach-backend","timestamp":"2026-02-20 01:35:48"}
+{"ip":"::1","level":"info","message":"Incoming request","method":"GET","path":"/api/v1/training-plans/active","service":"running-coach-backend","timestamp":"2026-02-20 01:35:48"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully","service":"running-coach-backend","timestamp":"2026-02-20 01:36:42"}

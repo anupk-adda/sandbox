@@ -1,0 +1,76 @@
+{
+  "provider": "openai",
+  "watsonx": {
+    "apiUrl": "https://us-south.ml.cloud.ibm.com/ml/v1/text/chat",
+    "apiVersion": "2023-05-29",
+    "accessToken": "${WATSONX_ACCESS_TOKEN}",
+    "projectId": "${WATSONX_PROJECT_ID}",
+    "models": {
+      "currentRunAnalyzer": {
+        "name": "openai/gpt-oss-120b",
+        "version": "latest"
+      },
+      "recentRunsComparator": {
+        "name": "openai/gpt-oss-120b",
+        "version": "latest"
+      },
+      "fitnessTrendAnalyzer": {
+        "name": "openai/gpt-oss-120b",
+        "version": "latest"
+      },
+      "coachAgent": {
+        "name": "openai/gpt-oss-120b",
+        "version": "latest"
+      }
+    },
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 2000,
+      "topP": 1.0,
+      "frequencyPenalty": 0.0,
+      "presencePenalty": 0.0
+    },
+    "timeout": 30000,
+    "retries": 3
+  },
+  "openai": {
+    "enabled": false,
+    "apiKey": "${OPENAI_API_KEY}",
+    "organization": "${OPENAI_ORG_ID}",
+    "baseUrl": "https://api.openai.com/v1",
+    "models": {
+      "currentRunAnalyzer": {
+        "name": "gpt-4-turbo-preview",
+        "version": "2024-01-01"
+      }
+    }
+  },
+  "fallback": {
+    "enabled": false,
+    "provider": "openai"
+  },
+  "rateLimiting": {
+    "requestsPerMinute": 60,
+    "tokensPerMinute": 90000,
+    "strategy": "sliding-window"
+  },
+  "caching": {
+    "enabled": true,
+    "ttl": 3600,
+    "maxSize": 100
+  },
+  "monitoring": {
+    "trackTokenUsage": true,
+    "trackLatency": true,
+    "trackErrors": true,
+    "alertThresholds": {
+      "errorRate": 0.05,
+      "avgLatency": 5000
+    }
+  },
+  "prompts": {
+    "versioning": true,
+    "versionFormat": "YYYY-MM-DD-v{number}",
+    "storageLocation": "./agent-service/src/prompts"
+  }
+}
