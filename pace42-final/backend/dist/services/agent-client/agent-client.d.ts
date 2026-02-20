@@ -54,15 +54,15 @@ export declare class AgentClient {
     /**
      * Analyze the user's latest run
      */
-    analyzeLastRun(): Promise<AgentAnalysis>;
+    analyzeLastRun(userId?: string): Promise<AgentAnalysis>;
     /**
      * Analyze the user's recent runs (last 3)
      */
-    analyzeRecentRuns(): Promise<AgentAnalysis>;
+    analyzeRecentRuns(userId?: string): Promise<AgentAnalysis>;
     /**
      * Analyze the user's fitness trend (3 months)
      */
-    analyzeFitnessTrend(numRuns?: number): Promise<AgentAnalysis>;
+    analyzeFitnessTrend(numRuns?: number, userId?: string): Promise<AgentAnalysis>;
     /**
      * Ask the coach agent a general running question
      */

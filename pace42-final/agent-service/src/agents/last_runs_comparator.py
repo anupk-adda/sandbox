@@ -5,7 +5,7 @@ Compares recent runs to identify trends and recommends the next workout based on
 
 import logging
 from typing import Dict, Any, Optional
-from ..llm import WatsonxProvider
+from ..llm import WatsonxProvider, get_llm_provider
 from .base_agent import FlexibleRunningAgent
 from ..utils.response_formatter import RunAnalysisFormatter
 from ..utils.chart_builder import build_run_metric_charts
@@ -19,15 +19,16 @@ class LastRunsComparator(FlexibleRunningAgent):
     Inherits from FlexibleRunningAgent for multi-step data gathering.
     """
     
-    def __init__(self, llm_provider: Optional[WatsonxProvider] = None):
+    def __init__(self, llm_provider: Optional[WatsonxProvider] = None, user_id: Optional[str] = None):
         """
         Initialize Last Runs Comparator
         
         Args:
             llm_provider: LLM provider instance (creates new if not provided)
+            user_id: Optional user ID for user-scoped data access
         """
         llm = llm_provider or WatsonxProvider()
-        super().__init__(llm, "LastRunsComparator", "multiple")
+        super().__init__(llm, "LastRunsComparator", "multiple", user_id=user_id)
         self.formatter = RunAnalysisFormatter()
     
     async def analyze_recent_runs(self, num_runs: int = 3) -> Dict[str, Any]:

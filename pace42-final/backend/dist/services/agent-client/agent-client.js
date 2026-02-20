@@ -13,14 +13,18 @@ export class AgentClient {
     /**
      * Analyze the user's latest run
      */
-    async analyzeLastRun() {
-        logger.info('Calling agent service: analyze latest run');
+    async analyzeLastRun(userId) {
+        logger.info('Calling agent service: analyze latest run', { userId });
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (userId) {
+                headers['X-User-ID'] = userId;
+            }
             const response = await fetch(`${this.baseUrl}/analyze-latest-run`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers,
                 signal: AbortSignal.timeout(this.timeout),
             });
             if (!response.ok) {
@@ -42,14 +46,18 @@ export class AgentClient {
     /**
      * Analyze the user's recent runs (last 3)
      */
-    async analyzeRecentRuns() {
-        logger.info('Calling agent service: analyze recent runs');
+    async analyzeRecentRuns(userId) {
+        logger.info('Calling agent service: analyze recent runs', { userId });
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (userId) {
+                headers['X-User-ID'] = userId;
+            }
             const response = await fetch(`${this.baseUrl}/analyze-recent-runs`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers,
                 signal: AbortSignal.timeout(this.timeout),
             });
             if (!response.ok) {
@@ -71,15 +79,19 @@ export class AgentClient {
     /**
      * Analyze the user's fitness trend (3 months)
      */
-    async analyzeFitnessTrend(numRuns = 8) {
-        logger.info('Calling agent service: analyze fitness trend');
+    async analyzeFitnessTrend(numRuns = 8, userId) {
+        logger.info('Calling agent service: analyze fitness trend', { userId });
         const cappedRuns = Math.min(Math.max(numRuns, 1), 8);
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (userId) {
+                headers['X-User-ID'] = userId;
+            }
             const response = await fetch(`${this.baseUrl}/analyze-fitness-trends?num_runs=${encodeURIComponent(cappedRuns)}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers,
                 signal: AbortSignal.timeout(this.timeout),
             });
             if (!response.ok) {

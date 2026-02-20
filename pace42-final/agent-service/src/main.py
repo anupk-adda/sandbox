@@ -230,7 +230,7 @@ async def analyze_latest_garmin_run(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 # Endpoint to analyze recent runs and recommend next workout
 @app.post("/analyze-recent-runs")
-async def analyze_recent_runs(num_runs: int = 3):
+async def analyze_recent_runs(request: Request, num_runs: int = 3):
     """
     Analyze recent runs and recommend next workout
     
@@ -241,8 +241,11 @@ async def analyze_recent_runs(num_runs: int = 3):
     try:
         from .agents import LastRunsComparator
         
-        # Initialize agent
-        comparator = LastRunsComparator(llm_provider)
+        user_id = get_user_id_from_request(request)
+        logger.info(f"Analyzing recent runs for user: {user_id}")
+        
+        # Initialize agent with user_id
+        comparator = LastRunsComparator(llm_provider, user_id=user_id)
         
         # Fetch and analyze recent runs, get recommendation
         analysis = await comparator.analyze_recent_runs(num_runs=num_runs)
@@ -257,7 +260,7 @@ async def analyze_recent_runs(num_runs: int = 3):
 
 # Endpoint to compare recent runs from Garmin
 @app.post("/compare-recent-runs")
-async def compare_recent_runs(num_runs: int = 3):
+async def compare_recent_runs(request: Request, num_runs: int = 3):
     """
     Fetch and compare recent runs from Garmin
     
@@ -267,8 +270,11 @@ async def compare_recent_runs(num_runs: int = 3):
     try:
         from .agents import LastRunsComparator
         
-        # Initialize agent
-        comparator = LastRunsComparator(llm_provider)
+        user_id = get_user_id_from_request(request)
+        logger.info(f"Comparing recent runs for user: {user_id}")
+        
+        # Initialize agent with user_id
+        comparator = LastRunsComparator(llm_provider, user_id=user_id)
         
         # Fetch and analyze recent runs
         analysis = await comparator.analyze_recent_runs(num_runs=num_runs)
@@ -293,8 +299,11 @@ async def analyze_fitness_trends(num_runs: int = 8):
     try:
         from .agents import FitnessTrendAnalyzer
         
-        # Initialize agent
-        analyzer = FitnessTrendAnalyzer(llm_provider)
+        user_id = get_user_id_from_request(request)
+        logger.info(f"Analyzing fitness trends for user: {user_id}")
+        
+        # Initialize agent with user_id
+        analyzer = FitnessTrendAnalyzer(llm_provider, user_id=user_id)
         
         capped_runs = min(max(num_runs, 1), 8)
         # Analyze fitness trends over last N runs

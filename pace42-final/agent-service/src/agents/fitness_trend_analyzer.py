@@ -4,7 +4,7 @@ Analyzes 10+ running activities to identify long-term patterns, trends, and prov
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Any
 from pathlib import Path
 from .base_agent import FlexibleRunningAgent
 from ..utils.response_formatter import RunAnalysisFormatter
@@ -19,16 +19,17 @@ class FitnessTrendAnalyzer(FlexibleRunningAgent):
     Inherits from FlexibleRunningAgent for multi-step data gathering.
     """
     
-    def __init__(self, llm_provider: Optional[Any] = None):
+    def __init__(self, llm_provider: Optional[Any] = None, user_id: Optional[str] = None):
         """
         Initialize Fitness Trend Analyzer
         
         Args:
             llm_provider: LLM provider instance (creates new if not provided)
+            user_id: Optional user ID for user-scoped data access
         """
         from ..llm import get_llm_provider
         llm = llm_provider or get_llm_provider()
-        super().__init__(llm, "FitnessTrendAnalyzer", "multiple")
+        super().__init__(llm, "FitnessTrendAnalyzer", "multiple", user_id=user_id)
         # Note: We don't use RunAnalysisFormatter for multi-run analysis
         # The LLM produces well-structured markdown directly
     
