@@ -42,6 +42,7 @@ class FlexibleRunningAgent(ABC):
         self.agent_name = agent_name
         self.data_scope = data_scope
         self.user_id = user_id
+        self.logger = logger  # Set logger first!
         
         # Use user-scoped client if user_id provided, otherwise fallback to singleton
         if user_id:
@@ -53,7 +54,6 @@ class FlexibleRunningAgent(ABC):
         
         self.normalizer = GarminDataNormalizer()
         self.formatter = OutputFormatter()
-        self.logger = logger
     
     async def gather_data(self, user_request: str, num_activities: int = 1) -> Dict[str, Any]:
         """
