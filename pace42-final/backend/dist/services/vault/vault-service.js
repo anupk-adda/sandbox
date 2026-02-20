@@ -23,6 +23,14 @@ class VaultService {
                 'Content-Type': 'application/json',
             },
         });
+        // Check for direct token (development mode)
+        const directToken = process.env.VAULT_TOKEN;
+        if (directToken) {
+            this.token = directToken;
+            this.isAvailable = true;
+            this.client.defaults.headers['X-Vault-Token'] = this.token;
+            logger.info('Using direct Vault token (development mode)');
+        }
         // Response interceptor for token refresh
         this.client.interceptors.response.use((response) => response, async (error) => {
             if (error.response?.status === 403 && this.token) {
@@ -40,14 +48,32 @@ class VaultService {
      * Check if Vault is configured and available
      */
     isConfigured() {
-        return !!(this.config.roleId && this.config.secretId);
+        // Support both AppRole and direct token auth
+        return !!(this.token || (this.config.roleId && this.config.secretId));
     }
     /**
-     * Authenticate with Vault using AppRole
+     * Authenticate with Vault using AppRole or verify direct token
      */
     async authenticate() {
         try {
-            if (!this.isConfigured()) {
+            // If we have a direct token, verify it works
+            if (this.token && !this.config.roleId) {
+                try {
+                    await this.client.get('/v1/auth/token/lookup-self', {
+                        headers: { 'X-Vault-Token': this.token }
+                    });
+                    this.isAvailable = true;
+                    logger.info('Direct Vault token verified');
+                    return true;
+                }
+                catch (error) {
+                    logger.error('Direct Vault token invalid');
+                    this.isAvailable = false;
+                    return false;
+                }
+            }
+            // Otherwise use AppRole
+            if (!this.config.roleId || !this.config.secretId) {
                 logger.warn('Vault not configured, using fallback mode');
                 this.isAvailable = false;
                 return false;
@@ -62,7 +88,7 @@ class VaultService {
             this.isAvailable = true;
             // Set token for future requests
             this.client.defaults.headers['X-Vault-Token'] = this.token;
-            logger.info('Successfully authenticated with Vault');
+            logger.info('Successfully authenticated with Vault via AppRole');
             return true;
         }
         catch (error) {

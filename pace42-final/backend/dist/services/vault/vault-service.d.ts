@@ -20,7 +20,7 @@ declare class VaultService {
      */
     isConfigured(): boolean;
     /**
-     * Authenticate with Vault using AppRole
+     * Authenticate with Vault using AppRole or verify direct token
      */
     authenticate(): Promise<boolean>;
     /**
