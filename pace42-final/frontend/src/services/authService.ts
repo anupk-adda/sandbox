@@ -55,6 +55,13 @@ const REFRESH_TOKEN_KEY = 'pace42_refresh_token';
 // Token refresh buffer (refresh 2 minutes before expiry)
 const TOKEN_REFRESH_BUFFER_MS = 2 * 60 * 1000;
 
+// Simple logger
+const logger = {
+  info: (message: string, meta?: Record<string, any>) => console.info(`[AuthService] ${message}`, meta || ''),
+  warn: (message: string, meta?: Record<string, any>) => console.warn(`[AuthService] ${message}`, meta || ''),
+  error: (message: string, meta?: Record<string, any>) => console.error(`[AuthService] ${message}`, meta || ''),
+};
+
 class AuthService {
   private state: AuthState = {
     isAuthenticated: false,
@@ -549,6 +556,20 @@ class AuthService {
       return { success: true };
     } catch (error) {
       return { success: false, error: 'Unable to validate Garmin credentials. Please try again.' };
+    }
+  }
+
+  // ============================================
+  // Token Management
+  // ============================================
+  getToken(): string | null {
+    try {
+      const authData = localStorage.getItem(AUTH_KEY);
+      if (!authData) return null;
+      const parsed = JSON.parse(authData);
+      return parsed.token || null;
+    } catch {
+      return null;
     }
   }
 

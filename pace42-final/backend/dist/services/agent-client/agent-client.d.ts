@@ -15,6 +15,8 @@ export interface AgentAnalysis {
     charts?: any[];
     chart_data?: any[];
     weather?: any;
+    run_samples?: any[];
+    runSamples?: any[];
 }
 export interface AgentPlanResponse {
     summary: {
@@ -98,6 +100,14 @@ export declare class AgentClient {
      * Health check for agent service
      */
     healthCheck(): Promise<boolean>;
+    /**
+     * Reset the Garmin MCP client singleton
+     * Call this when a user disconnects their Garmin account
+     */
+    resetGarminClient(): Promise<{
+        success: boolean;
+        message?: string;
+    }>;
 }
 export declare const agentClient: AgentClient;
 //# sourceMappingURL=agent-client.d.ts.map

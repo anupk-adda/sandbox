@@ -252,6 +252,34 @@ export class AgentClient {
             return false;
         }
     }
+    /**
+     * Reset the Garmin MCP client singleton
+     * Call this when a user disconnects their Garmin account
+     */
+    async resetGarminClient() {
+        logger.info('Calling agent service: reset Garmin client');
+        try {
+            const response = await fetch(`${this.baseUrl}/reset-garmin-client`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                signal: AbortSignal.timeout(10000),
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                logger.warn('Failed to reset Garmin client on agent service', { error });
+                return { success: false, message: error.detail || 'Failed to reset Garmin client' };
+            }
+            const data = await response.json();
+            logger.info('Garmin client reset successfully', { message: data.message });
+            return { success: true, message: data.message };
+        }
+        catch (error) {
+            logger.error('Error resetting Garmin client', { error });
+            return { success: false, message: 'Failed to reset Garmin client' };
+        }
+    }
 }
 export const agentClient = new AgentClient();
 // Made with Bob

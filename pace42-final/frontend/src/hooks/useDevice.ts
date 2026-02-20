@@ -97,7 +97,7 @@ export function useDevice(): DeviceInfo {
     updateDeviceInfo();
 
     // Listen for resize events with debounce
-    let resizeTimeout: NodeJS.Timeout;
+    let resizeTimeout: ReturnType<typeof setTimeout>;
     const handleResize = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(updateDeviceInfo, 100);
