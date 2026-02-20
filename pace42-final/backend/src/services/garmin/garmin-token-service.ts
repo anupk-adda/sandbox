@@ -86,14 +86,18 @@ export class GarminTokenService {
   /**
    * Exchange credentials for OAuth tokens (on-demand)
    * Called every time we need to fetch data from Garmin
+   * 
+   * @param userId - The user ID
+   * @param credentials - Optional credentials (if not provided, will fetch from Vault)
    */
   async exchangeCredentialsForTokens(
-    userId: string
+    userId: string,
+    credentials?: GarminCredentials
   ): Promise<TokenExchangeResult> {
     try {
-      // 1. Get credentials from Vault
-      const credentials = await this.getCredentials(userId);
-      if (!credentials) {
+      // 1. Get credentials (from parameter or Vault)
+      const creds = credentials || await this.getCredentials(userId);
+      if (!creds) {
         return { success: false, error: 'No Garmin credentials found' };
       }
 
@@ -103,7 +107,7 @@ export class GarminTokenService {
       await this.clearTokenStore();
 
       // 3. Spawn MCP server with credentials to perform login
-      const tokens = await this.performLoginAndExtractTokens(credentials);
+      const tokens = await this.performLoginAndExtractTokens(creds);
       
       if (!tokens) {
         return { success: false, error: 'Failed to obtain tokens from Garmin' };

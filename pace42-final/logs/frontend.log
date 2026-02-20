@@ -1,113 +1,123 @@
  INFO  Accepting connections at http://localhost:5173
- HTTP  20/02/2026 11:09:57 pm ::1 GET /
- HTTP  20/02/2026 11:09:57 pm ::1 Returned 200 in 15 ms
- HTTP  20/02/2026 11:10:58 pm ::1 GET /
- HTTP  20/02/2026 11:10:58 pm ::1 Returned 200 in 2 ms
- HTTP  20/02/2026 11:10:58 pm ::1 GET /assets/index-CwhRToLm.js
- HTTP  20/02/2026 11:10:58 pm ::1 GET /assets/index-6_mU9pIt.css
- HTTP  20/02/2026 11:10:58 pm ::1 Returned 200 in 4 ms
- HTTP  20/02/2026 11:10:58 pm ::1 Returned 200 in 6 ms
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_hero_runner.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_garmin_watch.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 5 ms
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 2 ms
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_weather_runner.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_data_visualization.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 3 ms
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 3 ms
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_finish_runner.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_focused_runner.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 GET /v2_final_cta.jpg
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 4 ms
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 5 ms
- HTTP  20/02/2026 11:10:59 pm ::1 Returned 200 in 6 ms
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_hero_runner.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_garmin_watch.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 2 ms
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 2 ms
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_weather_runner.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_data_visualization.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_finish_runner.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_focused_runner.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 GET /v2_final_cta.jpg
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:12:52 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:12:55 pm ::1 GET /
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 200 in 2 ms
- HTTP  20/02/2026 11:12:55 pm ::1 GET /assets/index-CwhRToLm.js
- HTTP  20/02/2026 11:12:55 pm ::1 GET /assets/index-6_mU9pIt.css
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 200 in 2 ms
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 200 in 2 ms
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_hero_runner.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_garmin_watch.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_weather_runner.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_data_visualization.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 2 ms
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 2 ms
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_final_cta.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_finish_runner.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:12:55 pm ::1 GET /v2_focused_runner.jpg
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:12:55 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /assets/index-CwhRToLm.js
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /assets/index-6_mU9pIt.css
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_hero_runner.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_garmin_watch.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_weather_runner.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_data_visualization.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_finish_runner.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_focused_runner.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:15:17 pm ::1 GET /v2_final_cta.jpg
- HTTP  20/02/2026 11:15:17 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:15:33 pm ::1 GET /
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:15:33 pm ::1 GET /assets/index-CwhRToLm.js
- HTTP  20/02/2026 11:15:33 pm ::1 GET /assets/index-6_mU9pIt.css
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 3 ms
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 3 ms
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_hero_runner.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_garmin_watch.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_weather_runner.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_data_visualization.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 2 ms
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_finish_runner.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_focused_runner.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:15:33 pm ::1 GET /v2_final_cta.jpg
- HTTP  20/02/2026 11:15:33 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:16:22 pm ::1 GET /
- HTTP  20/02/2026 11:16:22 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:16:22 pm ::1 GET /assets/index-CwhRToLm.js
- HTTP  20/02/2026 11:16:22 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:16:22 pm ::1 GET /assets/index-6_mU9pIt.css
- HTTP  20/02/2026 11:16:22 pm ::1 Returned 304 in 0 ms
- HTTP  20/02/2026 11:17:12 pm ::1 GET /
- HTTP  20/02/2026 11:17:12 pm ::1 Returned 200 in 1 ms
- HTTP  20/02/2026 11:17:12 pm ::1 GET /assets/index-CwhRToLm.js
- HTTP  20/02/2026 11:17:12 pm ::1 Returned 304 in 2 ms
- HTTP  20/02/2026 11:17:12 pm ::1 GET /assets/index-6_mU9pIt.css
- HTTP  20/02/2026 11:17:12 pm ::1 Returned 304 in 1 ms
- HTTP  20/02/2026 11:17:12 pm ::1 GET /favicon.ico
- HTTP  20/02/2026 11:17:12 pm ::1 Returned 404 in 1 ms
-
- INFO  Gracefully shutting down. Please wait...
+ HTTP  20/02/2026 11:30:52 pm ::1 GET /
+ HTTP  20/02/2026 11:30:52 pm ::1 Returned 200 in 14 ms
+ HTTP  20/02/2026 11:30:52 pm ::1 GET /
+ HTTP  20/02/2026 11:30:52 pm ::1 Returned 200 in 0 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /assets/index-CwhRToLm.js
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /assets/index-6_mU9pIt.css
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 4 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_weather_runner.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_hero_runner.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_garmin_watch.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 4 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_data_visualization.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_finish_runner.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_focused_runner.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 4 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 3 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 4 ms
+ HTTP  20/02/2026 11:31:14 pm ::1 GET /v2_final_cta.jpg
+ HTTP  20/02/2026 11:31:14 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /assets/index-CwhRToLm.js
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /assets/index-6_mU9pIt.css
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_hero_runner.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_garmin_watch.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_weather_runner.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_data_visualization.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_finish_runner.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_focused_runner.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:31:33 pm ::1 GET /v2_final_cta.jpg
+ HTTP  20/02/2026 11:31:33 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_hero_runner.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_garmin_watch.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_weather_runner.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_data_visualization.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_final_cta.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_finish_runner.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 GET /v2_focused_runner.jpg
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:33:01 pm ::1 Returned 304 in 2 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /assets/index-6_mU9pIt.css
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /assets/index-CwhRToLm.js
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 5 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 5 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_hero_runner.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_weather_runner.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_garmin_watch.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_finish_runner.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_focused_runner.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_data_visualization.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /v2_final_cta.jpg
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 200 in 0 ms
+ HTTP  20/02/2026 11:33:03 pm ::1 GET /favicon.ico
+ HTTP  20/02/2026 11:33:03 pm ::1 Returned 404 in 2 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 200 in 3 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /assets/index-CwhRToLm.js
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /assets/index-6_mU9pIt.css
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_hero_runner.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_garmin_watch.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_focused_runner.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_weather_runner.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_data_visualization.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_finish_runner.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 GET /v2_final_cta.jpg
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:33:47 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:09 pm ::1 GET /
+ HTTP  20/02/2026 11:34:09 pm ::1 Returned 200 in 1 ms
+ HTTP  20/02/2026 11:34:09 pm ::1 GET /assets/index-CwhRToLm.js
+ HTTP  20/02/2026 11:34:09 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:09 pm ::1 GET /assets/index-6_mU9pIt.css
+ HTTP  20/02/2026 11:34:09 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:09 pm ::1 GET /favicon.ico
+ HTTP  20/02/2026 11:34:09 pm ::1 Returned 404 in 1 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_hero_runner.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_data_visualization.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_focused_runner.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_finish_runner.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_final_cta.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_garmin_watch.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 GET /v2_weather_runner.jpg
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 1 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 0 ms
+ HTTP  20/02/2026 11:34:39 pm ::1 Returned 304 in 0 ms

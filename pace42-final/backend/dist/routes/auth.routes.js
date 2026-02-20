@@ -348,7 +348,7 @@ router.post('/validate-garmin', authenticateToken, async (req, res) => {
         }
         // Test the credentials by exchanging for tokens once
         logger.info('Testing Garmin credentials', { userId, garminUsername });
-        const testExchange = await garminTokenService.exchangeCredentialsForTokens(userId);
+        const testExchange = await garminTokenService.exchangeCredentialsForTokens(userId, { email: garminUsername, password: garminPassword });
         if (!testExchange.success) {
             logger.error('Credential test failed', { userId, error: testExchange.error });
             return res.status(400).json({

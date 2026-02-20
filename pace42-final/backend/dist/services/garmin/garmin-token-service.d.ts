@@ -34,8 +34,11 @@ export declare class GarminTokenService {
     /**
      * Exchange credentials for OAuth tokens (on-demand)
      * Called every time we need to fetch data from Garmin
+     *
+     * @param userId - The user ID
+     * @param credentials - Optional credentials (if not provided, will fetch from Vault)
      */
-    exchangeCredentialsForTokens(userId: string): Promise<TokenExchangeResult>;
+    exchangeCredentialsForTokens(userId: string, credentials?: GarminCredentials): Promise<TokenExchangeResult>;
     /**
      * Delete credentials (called during disconnect)
      */
