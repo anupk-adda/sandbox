@@ -2,36 +2,36 @@
 > running-coach-backend@1.0.0 start
 > node dist/server.js
 
-[dotenv@17.3.1] injecting env (4) from ../config/.env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.3.1] injecting env (4) from ../config/.env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
 Warning: Environment variable WATSONX_API_URL is not set
 Warning: Environment variable WATSONX_PROJECT_ID is not set
 Warning: Environment variable WATSONX_API_KEY is not set
-23:35:59 [[32minfo[39m]: Using direct Vault token (development mode) {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Using direct Vault token (development mode) {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
-23:35:59 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
-23:35:59 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Authenticating with Vault... {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Authenticating with Vault... {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Vault authentication successful {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Vault authentication successful {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
-23:35:59 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
-23:35:59 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: JWT secrets loaded from Vault {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: JWT secrets loaded from Vault {"service":"running-coach-backend"}
-23:35:59 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
-23:35:59 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
+23:44:48 [[32minfo[39m]: Using direct Vault token (development mode) {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Using direct Vault token (development mode) {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
+23:44:48 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
+23:44:48 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Authenticating with Vault... {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Authenticating with Vault... {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Vault authentication successful {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Vault authentication successful {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
+23:44:48 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
+23:44:48 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Direct Vault token verified {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: JWT secrets loaded from Vault {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: JWT secrets loaded from Vault {"service":"running-coach-backend"}
+23:44:48 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
+23:44:48 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏃 Running Coach Backend API

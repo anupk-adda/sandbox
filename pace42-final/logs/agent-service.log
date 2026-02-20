@@ -2,45 +2,8 @@ INFO:src.llm:Initializing LLM provider: openai
 INFO:src.llm.openai_provider:Initialized OpenAI provider with model: gpt-4o-mini
 INFO:src.mcp.garmin_client_async:Initialized Garmin MCP client: /Users/anupk/devops/mcp/garmin_mcp/garmin_mcp_server.py
 INFO:src.agents.base_agent:Initialized CurrentRunAnalyzer with scope: single
-INFO:     Started server process [26392]
+INFO:     Started server process [51083]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5001 (Press CTRL+C to quit)
-INFO:     127.0.0.1:65490 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65492 - "GET /health HTTP/1.1" 200 OK
-ERROR:src.main:Fitness trend analysis error: name 'request' is not defined
-INFO:     127.0.0.1:49765 - "POST /analyze-fitness-trends?num_runs=8 HTTP/1.1" 200 OK
-INFO:src.llm.openai_provider:Calling OpenAI API with model gpt-4o-mini
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
-ERROR:src.llm.openai_provider:Error calling OpenAI API: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-your-***********here. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}
-INFO:     127.0.0.1:49766 - "POST /classify-intent HTTP/1.1" 200 OK
-INFO:src.main:Analyzing latest run for user: None
-INFO:src.agents.base_agent:Analyzing latest run
-INFO:src.agents.base_agent:CurrentRunAnalyzer: Gathering data for 4 activities
-INFO:src.mcp.garmin_client_async:Fetching running activities (limit: 20)
-INFO:src.mcp.garmin_client_async:MCP session initialized
-Processing request of type ListToolsRequest
-INFO:src.mcp.garmin_client_async:Available MCP tools: ['get_activities_by_date', 'get_activities_fordate', 'get_activity', 'get_activity_splits', 'get_activity_typed_splits', 'get_activity_split_summaries', 'get_activity_weather', 'get_activity_hr_in_timezones', 'get_activity_gear', 'get_activity_exercise_sets', 'get_stats', 'get_user_summary', 'get_body_composition', 'get_stats_and_body', 'get_steps_data', 'get_daily_steps', 'get_training_readiness', 'get_body_battery', 'get_body_battery_events', 'get_blood_pressure', 'get_floors', 'get_training_status', 'get_rhr_day', 'get_heart_rates', 'get_hydration_data', 'get_sleep_data', 'get_stress_data', 'get_respiration_data', 'get_spo2_data', 'get_all_day_stress', 'get_all_day_events', 'get_full_name', 'get_unit_system', 'get_user_profile', 'get_userprofile_settings', 'get_devices', 'get_device_last_used', 'get_device_settings', 'get_primary_training_device', 'get_device_solar_data', 'get_device_alarms', 'get_gear', 'get_gear_defaults', 'get_gear_stats', 'get_weigh_ins', 'get_daily_weigh_ins', 'delete_weigh_ins', 'add_weigh_in', 'add_weigh_in_with_timestamps', 'get_goals', 'get_personal_record', 'get_earned_badges', 'get_adhoc_challenges', 'get_available_badge_challenges', 'get_badge_challenges', 'get_non_completed_badge_challenges', 'get_race_predictions', 'get_inprogress_virtual_challenges', 'get_progress_summary_between_dates', 'get_hill_score', 'get_endurance_score', 'get_training_effect', 'get_max_metrics', 'get_hrv_data', 'get_fitnessage_data', 'request_reload', 'get_workouts', 'get_workout_by_id', 'download_workout', 'upload_workout', 'upload_activity', 'add_body_composition', 'set_blood_pressure', 'add_hydration_data', 'get_pregnancy_summary', 'get_menstrual_data_for_date', 'get_menstrual_calendar_data', 'list_activities']
-INFO:src.mcp.garmin_client_async:Calling MCP tool: list_activities with args: {'activityType': 'running', 'limit': 20}
-Processing request of type CallToolRequest
-INFO:src.mcp.garmin_client_async:MCP tool returned, processing result
-INFO:src.mcp.garmin_client_async:Result type: <class 'mcp.types.CallToolResult'>, content length: 1
-INFO:src.mcp.garmin_client_async:First content type: <class 'mcp.types.TextContent'>
-INFO:src.mcp.garmin_client_async:Content text (first 200 chars): Last 1 activities:
-
---- Activity 1 ---
-Activity: testrun
-Type: street_running
-Date: 2026-02-20 05:30:00
-ID: 21924389447
-
-
-INFO:src.mcp.garmin_client_async:Skipping street_running activity: 21924389447
-WARNING:src.mcp.garmin_client_async:No running activity IDs found in response
-WARNING:src.mcp.garmin_client_async:No content in MCP result
-WARNING:src.agents.base_agent:CurrentRunAnalyzer: No activities found
-INFO:     127.0.0.1:49765 - "POST /analyze-latest-run HTTP/1.1" 200 OK
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [26392]
+INFO:     127.0.0.1:53016 - "GET /health HTTP/1.1" 200 OK

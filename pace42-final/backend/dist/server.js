@@ -10,7 +10,7 @@ import { errorHandler } from './middleware/error-handler.js';
 // Import routes
 import chatRoutes from './routes/chat.routes.js';
 import trainingPlanRoutes from './routes/training-plan.routes.js';
-import authRoutes from './routes/auth.routes.js';
+import authRoutes, { authenticateToken } from './routes/auth.routes.js';
 class Server {
     app;
     constructor() {
@@ -76,7 +76,7 @@ class Server {
             logger.info('Direct route hit!');
             res.json({ message: 'Direct route works', body: req.body });
         });
-        this.app.use(`${baseUrl}/chat`, chatRoutes);
+        this.app.use(`${baseUrl}/chat`, authenticateToken, chatRoutes);
         logger.info('Chat routes registered successfully');
         this.app.use(`${baseUrl}/auth`, authRoutes);
         // this.app.use(`${baseUrl}/activities`, activityRoutes);

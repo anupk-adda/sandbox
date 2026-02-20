@@ -277,8 +277,11 @@ router.post('/', async (req, res, next) => {
                 error: 'Message is required and must be a string',
             });
         }
+        // Get user ID from authenticated request
+        const userId = req.user?.userId || DEFAULT_USER_ID;
+        logger.info('Chat request from user', { userId });
         const conversationId = contextManager.getOrCreateConversation(sessionId);
-        contextManager.setUserId(conversationId, DEFAULT_USER_ID);
+        contextManager.setUserId(conversationId, userId);
         if (location?.latitude && location?.longitude) {
             contextManager.updateLocation(conversationId, location.latitude, location.longitude);
         }
@@ -294,7 +297,7 @@ router.post('/', async (req, res, next) => {
         });
         // Step 1: Classify intent (with context)
         const routingContext = contextManager.getContext(conversationId);
-        userProfileManager.updateFromConversation(DEFAULT_USER_ID, conversationId, routingContext.summary, personaAgent.getProfileContext(conversationId));
+        userProfileManager.updateFromConversation(userId, conversationId, routingContext.summary, personaAgent.getProfileContext(conversationId));
         const contextPayload = {
             last_user_messages: (routingContext.recent_messages || [])
                 .filter(msg => msg.role === 'user')
@@ -326,8 +329,8 @@ router.post('/', async (req, res, next) => {
         if (unsubscribeConfirmations.get(conversationId)) {
             if (isConfirmUnsubscribe(normalizedMessage)) {
                 unsubscribeConfirmations.delete(conversationId);
-                trainingPlanService.setSubscription(DEFAULT_USER_ID, false);
-                const activePlanId = trainingPlanService.getActivePlanForUser(DEFAULT_USER_ID);
+                trainingPlanService.setSubscription(userId, false);
+                const activePlanId = trainingPlanService.getActivePlanForUser(userId);
                 const summary = activePlanId ? trainingPlanService.getPlanSummary(activePlanId) : undefined;
                 const response = {
                     response: 'You are unsubscribed. I can re-enable tracking anytime.',
@@ -337,14 +340,14 @@ router.post('/', async (req, res, next) => {
                     agent: 'Plan Coach',
                     confidence: 0.7,
                     planSummary: summary,
-                    prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                    prompts: trainingPlanService.getPromptsForUser(userId),
                 };
                 contextManager.recordMessage(conversationId, 'assistant', response.response);
                 return res.json(response);
             }
             if (isCancelUnsubscribe(normalizedMessage)) {
                 unsubscribeConfirmations.delete(conversationId);
-                const activePlanId = trainingPlanService.getActivePlanForUser(DEFAULT_USER_ID);
+                const activePlanId = trainingPlanService.getActivePlanForUser(userId);
                 const summary = activePlanId ? trainingPlanService.getPlanSummary(activePlanId) : undefined;
                 const response = {
                     response: 'Got it. You are still subscribed and tracking is unchanged.',
@@ -354,7 +357,7 @@ router.post('/', async (req, res, next) => {
                     agent: 'Plan Coach',
                     confidence: 0.7,
                     planSummary: summary,
-                    prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                    prompts: trainingPlanService.getPromptsForUser(userId),
                 };
                 contextManager.recordMessage(conversationId, 'assistant', response.response);
                 return res.json(response);
@@ -371,7 +374,7 @@ router.post('/', async (req, res, next) => {
             return res.json(response);
         }
         if (isShowFullPlan(normalizedMessage)) {
-            const activePlanId = trainingPlanService.getActivePlanForUser(DEFAULT_USER_ID);
+            const activePlanId = trainingPlanService.getActivePlanForUser(userId);
             if (!activePlanId) {
                 const response = {
                     response: 'I don’t see an active plan yet. Tell me your goal distance and race date to get started.',
@@ -395,13 +398,13 @@ router.post('/', async (req, res, next) => {
                 confidence: 0.85,
                 planSummary: summary,
                 weeklyDetail: week,
-                prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                prompts: trainingPlanService.getPromptsForUser(userId),
             };
             contextManager.recordMessage(conversationId, 'assistant', response.response);
             return res.json(response);
         }
         if (isTrackTraining(normalizedMessage)) {
-            const activePlanId = trainingPlanService.getActivePlanForUser(DEFAULT_USER_ID);
+            const activePlanId = trainingPlanService.getActivePlanForUser(userId);
             if (!activePlanId) {
                 const response = {
                     response: 'I don’t see an active plan yet. Tell me your goal distance and race date to get started.',
@@ -428,14 +431,14 @@ router.post('/', async (req, res, next) => {
                 planSummary: summary,
                 charts,
                 trainingSummary,
-                prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                prompts: trainingPlanService.getPromptsForUser(userId),
             };
             contextManager.recordMessage(conversationId, 'assistant', response.response);
             return res.json(response);
         }
         if (isSubscribePlan(normalizedMessage)) {
-            trainingPlanService.setSubscription(DEFAULT_USER_ID, true);
-            const activePlanId = trainingPlanService.getActivePlanForUser(DEFAULT_USER_ID);
+            trainingPlanService.setSubscription(userId, true);
+            const activePlanId = trainingPlanService.getActivePlanForUser(userId);
             const summary = activePlanId ? trainingPlanService.getPlanSummary(activePlanId) : undefined;
             const response = {
                 response: 'You’re all set. Tracking is enabled for your plan.',
@@ -445,14 +448,14 @@ router.post('/', async (req, res, next) => {
                 agent: 'Plan Coach',
                 confidence: 0.7,
                 planSummary: summary,
-                prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                prompts: trainingPlanService.getPromptsForUser(userId),
             };
             contextManager.recordMessage(conversationId, 'assistant', response.response);
             return res.json(response);
         }
         if (isUnsubscribePlan(normalizedMessage)) {
             unsubscribeConfirmations.set(conversationId, true);
-            const activePlanId = trainingPlanService.getActivePlanForUser(DEFAULT_USER_ID);
+            const activePlanId = trainingPlanService.getActivePlanForUser(userId);
             const summary = activePlanId ? trainingPlanService.getPlanSummary(activePlanId) : undefined;
             const response = {
                 response: 'Are you sure you want to unsubscribe? Reply "Confirm unsubscribe" to remove tracking or "Cancel" to keep it.',
@@ -462,7 +465,7 @@ router.post('/', async (req, res, next) => {
                 agent: 'Plan Coach',
                 confidence: 0.7,
                 planSummary: summary,
-                prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                prompts: trainingPlanService.getPromptsForUser(userId),
             };
             contextManager.recordMessage(conversationId, 'assistant', response.response);
             return res.json(response);
@@ -528,7 +531,7 @@ router.post('/', async (req, res, next) => {
                     requiresGarminData: false,
                     agent: 'Plan Coach',
                     confidence: 0.75,
-                    prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                    prompts: trainingPlanService.getPromptsForUser(userId),
                 };
                 contextManager.recordMessage(conversationId, 'assistant', response.response);
                 return res.json(response);
@@ -536,7 +539,7 @@ router.post('/', async (req, res, next) => {
             let summary;
             let week;
             try {
-                const profileContext = userProfileManager.getUserProfileContext(DEFAULT_USER_ID);
+                const profileContext = userProfileManager.getUserProfileContext(userId);
                 const agentPlan = await agentClient.generateTrainingPlan({
                     goal_distance: nextDraft.goalDistance,
                     target_date: nextDraft.goalDate,
@@ -556,7 +559,7 @@ router.post('/', async (req, res, next) => {
                     })),
                 };
                 const result = trainingPlanService.createPlanFromAgent({
-                    userId: DEFAULT_USER_ID,
+                    userId: userId,
                     goalDistance: nextDraft.goalDistance,
                     goalDate: nextDraft.goalDate,
                     daysPerWeek: nextDraft.daysPerWeek,
@@ -591,7 +594,7 @@ router.post('/', async (req, res, next) => {
                 confidence: 0.9,
                 planSummary: summary,
                 weeklyDetail: week,
-                prompts: trainingPlanService.getPromptsForUser(DEFAULT_USER_ID),
+                prompts: trainingPlanService.getPromptsForUser(userId),
             };
             contextManager.recordMessage(conversationId, 'assistant', response.response);
             return res.json(response);
@@ -714,18 +717,18 @@ router.post('/', async (req, res, next) => {
             try {
                 switch (intent.type) {
                     case 'last_run':
-                        logger.info('Routing to Agent 1: Current Run Analyzer');
-                        analysis = await agentClient.analyzeLastRun();
+                        logger.info('Routing to Agent 1: Current Run Analyzer', { userId });
+                        analysis = await agentClient.analyzeLastRun(userId);
                         agentUsed = 'Agent 1 - Current Run Analyzer';
                         break;
                     case 'recent_runs':
-                        logger.info('Routing to Agent 2: Last Runs Comparator');
-                        analysis = await agentClient.analyzeRecentRuns();
+                        logger.info('Routing to Agent 2: Last Runs Comparator', { userId });
+                        analysis = await agentClient.analyzeRecentRuns(userId);
                         agentUsed = 'Agent 2 - Last Runs Comparator';
                         break;
                     case 'fitness_trend':
-                        logger.info('Routing to Agent 3: Fitness Trend Analyzer');
-                        analysis = await agentClient.analyzeFitnessTrend(MAX_TREND_RUNS);
+                        logger.info('Routing to Agent 3: Fitness Trend Analyzer', { userId });
+                        analysis = await agentClient.analyzeFitnessTrend(MAX_TREND_RUNS, userId);
                         agentUsed = 'Agent 3 - Fitness Trend Analyzer';
                         break;
                     default:
@@ -782,7 +785,7 @@ router.post('/', async (req, res, next) => {
             try {
                 const context = contextManager.getContext(conversationId);
                 const personaContext = personaAgent.getProfileContext(conversationId) || personaAgent.getLatestProfileContext();
-                const userProfileContext = userProfileManager.getUserProfileContext(DEFAULT_USER_ID);
+                const userProfileContext = userProfileManager.getUserProfileContext(userId);
                 const enrichedContext = personaContext
                     ? { ...context, persona_profile: personaContext }
                     : context;

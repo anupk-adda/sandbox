@@ -289,7 +289,7 @@ async def compare_recent_runs(request: Request, num_runs: int = 3):
 
 # Endpoint to analyze fitness trends
 @app.post("/analyze-fitness-trends")
-async def analyze_fitness_trends(num_runs: int = 8):
+async def analyze_fitness_trends(request: Request, num_runs: int = 8):
     """
     Analyze fitness trends over last N running activities
     
@@ -315,6 +315,7 @@ async def analyze_fitness_trends(num_runs: int = 8):
         }
     except Exception as e:
         logger.error(f"Fitness trend analysis error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Endpoint for general running coaching questions
 @app.post("/coach")
