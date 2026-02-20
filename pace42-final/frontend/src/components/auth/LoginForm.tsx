@@ -5,12 +5,14 @@ import { User, Lock, ArrowRight, Loader2, UserPlus } from 'lucide-react';
 interface LoginFormProps {
   onSuccess: () => void;
   onSwitchToSignup: () => void;
+  onForgotPassword: () => void;
 }
 
-export function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProps) {
-  const [credentials, setCredentials] = useState<UserCredentials>({
+export function LoginForm({ onSuccess, onSwitchToSignup, onForgotPassword }: LoginFormProps) {
+  const [credentials, setCredentials] = useState<UserCredentials & { rememberMe: boolean }>({
     username: '',
     password: '',
+    rememberMe: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +70,29 @@ export function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProps) {
             className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4AA] transition-colors"
             disabled={isLoading}
           />
+        </div>
+
+        {/* Remember Me & Forgot Password */}
+        <div className="flex items-center justify-between text-sm">
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={credentials.rememberMe}
+              onChange={(e) => setCredentials(prev => ({ ...prev, rememberMe: e.target.checked }))}
+              className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#00D4AA] focus:ring-[#00D4AA] focus:ring-offset-0 cursor-pointer"
+            />
+            <span className="text-white/60 group-hover:text-white/80 transition-colors">
+              Remember me
+            </span>
+          </label>
+          
+          <button
+            type="button"
+            onClick={onForgotPassword}
+            className="text-[#00D4AA] hover:underline"
+          >
+            Forgot password?
+          </button>
         </div>
 
         {error && (

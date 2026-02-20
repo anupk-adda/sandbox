@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { authService, type UserCredentials } from '../../services/authService';
-import { User, Lock, ArrowRight, Loader2, LogIn, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { authService } from '../../services/authService';
+import { Lock, Eye, EyeOff, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
-interface SignupFormProps {
+interface ResetPasswordFormProps {
+  token: string;
   onSuccess: () => void;
-  onSwitchToLogin: () => void;
 }
 
-export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
-  const [credentials, setCredentials] = useState<UserCredentials & { rememberMe: boolean }>({
-    username: '',
-    password: '',
-    rememberMe: false,
+export function ResetPasswordForm({ token, onSuccess }: ResetPasswordFormProps) {
+  const [passwords, setPasswords] = useState({
+    newPassword: '',
+    confirmPassword: '',
   });
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
     length: false,
     uppercase: false,
@@ -24,6 +24,18 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
     number: false,
     special: false,
   });
+
+  useEffect(() => {
+    verifyToken();
+  }, [token]);
+
+  const verifyToken = async () => {
+    const result = await authService.verifyResetToken(token);
+    if (!result.valid) {
+      setError(result.error || 'Invalid or expired reset link');
+    }
+    setIsVerifying(false);
+  };
 
   const checkPasswordStrength = (password: string) => {
     setPasswordStrength({
@@ -36,9 +48,9 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const password = e.target.value;
-    setCredentials(prev => ({ ...prev, password }));
-    checkPasswordStrength(password);
+    const newPassword = e.target.value;
+    setPasswords(prev => ({ ...prev, newPassword }));
+    checkPasswordStrength(newPassword);
   };
 
   const getStrengthPercentage = () => {
@@ -56,77 +68,110 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
     return 'bg-green-500';
   };
 
-  const isPasswordValid = () => {
-    return Object.values(passwordStrength).every(Boolean);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!isPasswordValid()) {
-      setError('Password does not meet all requirements');
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
-    if (credentials.password !== confirmPassword) {
-      setError('Passwords do not match');
+    const strength = getStrengthPercentage();
+    if (strength < 60) {
+      setError('Please choose a stronger password');
       return;
     }
 
     setIsLoading(true);
 
-    const result = await authService.signup(credentials);
+    const result = await authService.resetPassword(token, passwords.newPassword);
     
     setIsLoading(false);
     
     if (result.success) {
-      onSuccess();
+      setSuccess(true);
+      setTimeout(() => {
+        onSuccess();
+      }, 2000);
     } else {
-      setError(result.error || 'Signup failed');
+      setError(result.error || 'Failed to reset password');
     }
   };
+
+  if (isVerifying) {
+    return (
+      <div className="w-full max-w-md text-center py-12">
+        <Loader2 className="w-8 h-8 text-[#00D4AA] animate-spin mx-auto mb-4" />
+        <p className="text-white/60">Verifying reset link...</p>
+      </div>
+    );
+  }
+
+  if (error && !success) {
+    return (
+      <div className="w-full max-w-md text-center py-12">
+        <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="w-8 h-8 text-red-500" />
+        </div>
+        <h2 className="font-display font-bold text-2xl text-white mb-2">
+          Invalid Link
+        </h2>
+        <p className="text-white/60 mb-6">
+          {error}
+        </p>
+        <button
+          onClick={onSuccess}
+          className="btn-accent inline-flex items-center gap-2"
+        >
+          Go to sign in
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="w-full max-w-md text-center py-12">
+        <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-green-500" />
+        </div>
+        <h2 className="font-display font-bold text-2xl text-white mb-2">
+          Password Reset!
+        </h2>
+        <p className="text-white/60">
+          Your password has been reset successfully. Redirecting to sign in...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <div className="w-16 h-16 rounded-full bg-[#00D4AA]/20 flex items-center justify-center mx-auto mb-4">
-          <User className="w-8 h-8 text-[#00D4AA]" />
+          <Lock className="w-8 h-8 text-[#00D4AA]" />
         </div>
         <h2 className="font-display font-bold text-2xl text-white mb-2">
-          Create your account
+          Reset password
         </h2>
         <p className="text-white/60">
-          Start your personalized training journey
+          Create a new secure password for your account.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Username */}
-        <div className="relative">
-          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-          <input
-            type="text"
-            value={credentials.username}
-            onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
-            placeholder="Email address"
-            className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4AA] transition-colors"
-            disabled={isLoading}
-            required
-          />
-        </div>
-
-        {/* Password */}
+        {/* New Password */}
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
           <input
             type={showPassword ? 'text' : 'password'}
-            value={credentials.password}
+            value={passwords.newPassword}
             onChange={handlePasswordChange}
-            placeholder="Create a password"
+            placeholder="New password"
             className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4AA] transition-colors"
             disabled={isLoading}
-            required
           />
           <button
             type="button"
@@ -138,7 +183,7 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
         </div>
 
         {/* Password Strength Indicator */}
-        {credentials.password && (
+        {passwords.newPassword && (
           <div className="space-y-2">
             <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
               <div
@@ -171,71 +216,46 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
           <input
             type={showPassword ? 'text' : 'password'}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm your password"
+            value={passwords.confirmPassword}
+            onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))}
+            placeholder="Confirm new password"
             className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-[#00D4AA] transition-colors"
             disabled={isLoading}
-            required
           />
         </div>
 
-        {confirmPassword && credentials.password !== confirmPassword && (
-          <div className="text-red-400 text-sm">
+        {passwords.confirmPassword && passwords.newPassword !== passwords.confirmPassword && (
+          <div className="text-red-400 text-sm flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
             Passwords do not match
           </div>
         )}
 
-        {/* Remember Me */}
-        <label className="flex items-center gap-2 cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={credentials.rememberMe}
-            onChange={(e) => setCredentials(prev => ({ ...prev, rememberMe: e.target.checked }))}
-            className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#00D4AA] focus:ring-[#00D4AA] focus:ring-offset-0 cursor-pointer"
-          />
-          <span className="text-white/60 group-hover:text-white/80 transition-colors text-sm">
-            Remember me on this device
-          </span>
-        </label>
-
         {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
             {error}
           </div>
         )}
 
         <button
           type="submit"
-          disabled={isLoading || !credentials.username || !isPasswordValid() || credentials.password !== confirmPassword}
+          disabled={isLoading || !passwords.newPassword || passwords.newPassword !== passwords.confirmPassword}
           className="w-full btn-accent flex items-center justify-center gap-2 py-4 disabled:opacity-50"
         >
           {isLoading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Creating account...
+              Resetting...
             </>
           ) : (
             <>
-              Create account
+              Reset password
               <ArrowRight className="w-5 h-5" />
             </>
           )}
         </button>
       </form>
-
-      <div className="mt-6 text-center">
-        <p className="text-white/40 text-sm">
-          Already have an account?{' '}
-          <button 
-            onClick={onSwitchToLogin}
-            className="text-[#00D4AA] hover:underline inline-flex items-center gap-1"
-          >
-            <LogIn className="w-3 h-3" />
-            Sign in
-          </button>
-        </p>
-      </div>
     </div>
   );
 }

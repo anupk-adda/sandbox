@@ -2,7 +2,7 @@
 
 # ============================================
 # pace42 Unified - Complete Startup Script
-# Starts Agent Service + Backend + Frontend
+# Starts Vault + Agent Service + Backend + Frontend
 # ============================================
 
 set -e
@@ -61,6 +61,7 @@ kill_port() {
 cleanup() {
     echo ""
     echo -e "${YELLOW}🛑 Stopping services...${NC}"
+    [ -n "$VAULT_PID" ] && kill $VAULT_PID 2>/dev/null && echo "  Vault stopped"
     [ -n "$AGENT_PID" ] && kill $AGENT_PID 2>/dev/null && echo "  Agent service stopped"
     [ -n "$BACKEND_PID" ] && kill $BACKEND_PID 2>/dev/null && echo "  Backend stopped"
     [ -n "$FRONTEND_PID" ] && kill $FRONTEND_PID 2>/dev/null && echo "  Frontend stopped"
@@ -70,7 +71,82 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 # ============================================
-# 1. Start Agent Service (Python)
+# 1. Setup HashiCorp Vault
+# ============================================
+echo -e "${BLUE}🔐 Setting up HashiCorp Vault...${NC}"
+
+VAULT_DIR="$PROJECT_ROOT/vault"
+if [ -f "$VAULT_DIR/setup-vault.sh" ]; then
+    cd "$VAULT_DIR"
+    
+    # Setup Vault (starts server and configures it)
+    ./setup-vault.sh > "$PROJECT_ROOT/logs/vault-setup.log" 2>&1
+    
+    # Check if Vault is running
+    if pgrep -f "vault server" > /dev/null; then
+        echo -e "${GREEN}  ✓ Vault is running${NC}"
+        VAULT_PID=$(pgrep -f "vault server")
+    else
+        echo -e "${YELLOW}  ⚠ Vault setup incomplete, continuing without Vault${NC}"
+    fi
+else
+    echo -e "${YELLOW}  ⚠ Vault setup script not found, continuing without Vault${NC}"
+fi
+
+echo ""
+
+# ============================================
+# 2. Run Database Migrations
+# ============================================
+echo -e "${BLUE}🗄️  Running database migrations...${NC}"
+
+# Ensure database directory exists
+mkdir -p "$PROJECT_ROOT/backend/database"
+
+# Run migrations using Node.js script
+cd "$PROJECT_ROOT/backend"
+if [ -f "../database/migrations/002_auth_improvements.sql" ]; then
+    node -e "
+        const Database = require('better-sqlite3');
+        const path = require('path');
+        
+        const dbPath = path.join(__dirname, 'database', 'running_coach.db');
+        const db = new Database(dbPath);
+        
+        try {
+            // Read and execute migration
+            const fs = require('fs');
+            const migration = fs.readFileSync('../database/migrations/002_auth_improvements.sql', 'utf8');
+            
+            // Split by semicolons and execute each statement
+            const statements = migration.split(';').filter(s => s.trim());
+            
+            db.exec('BEGIN TRANSACTION;');
+            for (const stmt of statements) {
+                try {
+                    db.exec(stmt + ';');
+                } catch (e) {
+                    // Ignore errors for IF NOT EXISTS statements
+                    if (!e.message.includes('already exists')) {
+                        throw e;
+                    }
+                }
+            }
+            db.exec('COMMIT;');
+            console.log('✓ Database migrations applied');
+        } catch (error) {
+            db.exec('ROLLBACK;');
+            console.error('Migration error:', error.message);
+        } finally {
+            db.close();
+        }
+    " 2>/dev/null || echo "  ⚠ Migrations may have already been applied"
+fi
+
+echo ""
+
+# ============================================
+# 3. Start Agent Service (Python)
 # ============================================
 echo -e "${BLUE}🤖 Setting up Agent Service...${NC}"
 cd "$PROJECT_ROOT/agent-service"
@@ -117,7 +193,7 @@ done
 echo ""
 
 # ============================================
-# 2. Start Backend (Node.js)
+# 4. Start Backend (Node.js)
 # ============================================
 echo -e "${BLUE}📦 Setting up Backend...${NC}"
 cd "$PROJECT_ROOT/backend"
@@ -161,7 +237,7 @@ done
 echo ""
 
 # ============================================
-# 3. Setup Frontend
+# 5. Setup Frontend
 # ============================================
 echo -e "${BLUE}⚛️  Setting up Frontend...${NC}"
 cd "$PROJECT_ROOT/frontend"
@@ -199,16 +275,19 @@ echo "🌐 Access your app:"
 echo "   Frontend: ${GREEN}http://localhost:5173${NC}"
 echo ""
 echo "🔧 Services:"
+echo "   Vault:     http://localhost:8200 (if configured)"
 echo "   Backend:   http://localhost:3000"
 echo "   Agent:     http://localhost:5001"
 echo ""
 echo "📊 Health Checks:"
 echo "   Backend:  curl http://localhost:3000/health"
 echo "   Agent:    curl http://localhost:5001/health"
+echo "   Vault:    curl http://localhost:8200/v1/sys/health"
 echo ""
 echo "📝 Logs:"
 echo "   tail -f $PROJECT_ROOT/logs/backend.log"
 echo "   tail -f $PROJECT_ROOT/logs/agent-service.log"
+echo "   tail -f $PROJECT_ROOT/logs/vault-setup.log"
 echo ""
 echo "Press Ctrl+C to stop all services"
 echo ""

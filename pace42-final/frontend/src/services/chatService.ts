@@ -144,7 +144,8 @@ class ChatService {
     location?: { latitude: number; longitude: number }
   ): Promise<ChatResponse> {
     // Check session validity before making request
-    if (!authService.checkAndLogoutIfExpired()) {
+    if (!authService.isSessionValid()) {
+      authService.logout();
       throw new Error('Session expired. Please login again.');
     }
 

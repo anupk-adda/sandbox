@@ -1,0 +1,14 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 HashiCorp Vault Setup for pace42
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Starting Vault server...
+✅ Vault server started
+🆕 Initializing Vault...
+🔓 Unsealing Vault...
+Unseal Key (will be hidden): 
+An error occurred attempting to ask for an unseal key. The raw error message
+is shown below, but usually this is because you attempted to pipe a value
+into the unseal command or you are executing outside of a terminal (tty). You
+should run the unseal command from a terminal for maximum security. If this
+is not an option, the unseal key can be provided as the first argument to the
+unseal command. The raw error was:  file descriptor 0 is not a terminal
