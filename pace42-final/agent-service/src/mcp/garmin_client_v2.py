@@ -42,6 +42,9 @@ class UserScopedGarminClient:
         """
         Set up environment with tokens from Vault for this user.
         
+        The MCP server checks GARMINTOKENS env var. If the value is > 512 chars,
+        garminconnect library treats it as base64 encoded tokens.
+        
         Returns:
             Environment dictionary with tokens injected
         """
@@ -51,10 +54,10 @@ class UserScopedGarminClient:
         tokens_b64 = get_garmin_tokens(self.user_id)
         
         if tokens_b64:
-            # Set tokens in environment - MCP server will use these
-            env['GARMIN_TOKENS_B64'] = tokens_b64
-            env['GARMIN_TOKENSTORE'] = ''  # Disable filesystem tokenstore
-            logger.info(f"Injected Vault tokens for user {self.user_id}")
+            # Set GARMINTOKENS to base64 tokens
+            # garminconnect library treats strings > 512 chars as base64
+            env['GARMINTOKENS'] = tokens_b64
+            logger.info(f"Injected Vault tokens for user {self.user_id} via GARMINTOKENS")
         else:
             logger.warning(f"No tokens available for user {self.user_id}")
         
