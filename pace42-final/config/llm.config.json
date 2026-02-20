@@ -34,7 +34,7 @@
     "retries": 3
   },
   "openai": {
-    "enabled": false,
+    "enabled": true,
     "apiKey": "${OPENAI_API_KEY}",
     "organization": "${OPENAI_ORG_ID}",
     "baseUrl": "https://api.openai.com/v1",
