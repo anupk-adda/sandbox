@@ -10,9 +10,6 @@ import { errorHandler } from './middleware/error-handler.js';
 import chatRoutes from './routes/chat.routes.js';
 import trainingPlanRoutes from './routes/training-plan.routes.js';
 import authRoutes from './routes/auth.routes.js';
-// import activityRoutes from './routes/activity.routes';
-// import analysisRoutes from './routes/analysis.routes';
-// import trainingPlanRoutes from './routes/training-plan.routes';
 class Server {
     app;
     constructor() {
