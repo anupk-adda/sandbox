@@ -1,0 +1,8 @@
+
+# HashiCorp Vault - large binaries and data
+vault/vault
+vault/vault.zip
+vault/data/
+vault/*.log
+vault/vault-init.json
+vault/vault-init.json

@@ -1,3 +1,4 @@
 {"error":"Error code: 401 - {'error': {'message': 'Incorrect API key provided: your-ope************here. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}","level":"error","message":"Agent returned error","service":"running-coach-backend","timestamp":"2026-02-20 00:16:33"}
 {"error":{},"level":"error","message":"Error calling agent service","service":"running-coach-backend","timestamp":"2026-02-20 00:17:05"}
 {"error":{},"level":"error","message":"Error calling agent service","service":"running-coach-backend","timestamp":"2026-02-20 00:17:13"}
+{"error":{"code":"SQLITE_ERROR"},"level":"error","message":"Signup error","service":"running-coach-backend","timestamp":"2026-02-20 12:37:32"}

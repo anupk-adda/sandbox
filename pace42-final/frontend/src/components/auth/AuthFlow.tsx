@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { authService, type AuthState } from '../../services/authService';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
 import { GarminConnectForm } from './GarminConnectForm';
+import { ForgotPasswordForm } from './ForgotPasswordForm';
+import { ResetPasswordForm } from './ResetPasswordForm';
 import { Chat } from '../Chat';
 import { Logo } from './Logo';
 import { CheckCircle, XCircle, Loader2, LayoutDashboard } from 'lucide-react';
 
-type AuthView = 'login' | 'signup' | 'garmin' | 'chat';
+type AuthView = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'garmin' | 'chat';
 
 interface ServiceStatus {
   healthy: boolean;
@@ -19,6 +21,7 @@ interface ServiceStatus {
 }
 
 export function AuthFlow() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [view, setView] = useState<AuthView>('login');
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
@@ -29,6 +32,13 @@ export function AuthFlow() {
   const [isCheckingServices, setIsCheckingServices] = useState(true);
 
   useEffect(() => {
+    // Check for reset token in URL
+    const resetToken = searchParams.get('token');
+    if (resetToken) {
+      setView('reset-password');
+      return;
+    }
+
     // Subscribe to auth state changes
     const unsubscribe = authService.subscribe((state) => {
       setAuthState(state);
@@ -38,11 +48,20 @@ export function AuthFlow() {
     const initialState = authService.getState();
     setAuthState(initialState);
 
+    // If already authenticated, go to chat or garmin
+    if (initialState.isAuthenticated) {
+      if (initialState.isGarminConnected) {
+        setView('chat');
+      } else {
+        setView('garmin');
+      }
+    }
+
     // Check backend services
     checkServices();
 
     return unsubscribe;
-  }, []);
+  }, [searchParams]);
 
   const checkServices = async () => {
     setIsCheckingServices(true);
@@ -72,11 +91,22 @@ export function AuthFlow() {
     setView('chat');
   };
 
+  const handleResetPasswordSuccess = () => {
+    // Clear the token from URL
+    setSearchParams({});
+    // Use window.location to clear URL without triggering React Router navigation issues
+    window.history.replaceState({}, '', window.location.pathname);
+    setView('login');
+  };
+
   // Progress indicator
   const getProgress = () => {
     switch (view) {
       case 'login':
-      case 'signup': return 33;
+      case 'signup':
+      case 'forgot-password':
+      case 'reset-password':
+        return 33;
       case 'garmin': return 66;
       case 'chat': return 100;
       default: return 0;
@@ -170,6 +200,7 @@ export function AuthFlow() {
               <LoginForm 
                 onSuccess={handleLoginSuccess} 
                 onSwitchToSignup={() => setView('signup')}
+                onForgotPassword={() => setView('forgot-password')}
               />
             </div>
           )}
@@ -179,6 +210,23 @@ export function AuthFlow() {
               <SignupForm 
                 onSuccess={handleSignupSuccess}
                 onSwitchToLogin={() => setView('login')}
+              />
+            </div>
+          )}
+
+          {view === 'forgot-password' && (
+            <div className="animate-fade-in">
+              <ForgotPasswordForm 
+                onBack={() => setView('login')}
+              />
+            </div>
+          )}
+
+          {view === 'reset-password' && (
+            <div className="animate-fade-in">
+              <ResetPasswordForm 
+                token={searchParams.get('token') || ''}
+                onSuccess={handleResetPasswordSuccess}
               />
             </div>
           )}
