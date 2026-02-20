@@ -305,73 +305,74 @@ class VaultService {
   }
 
   /**
-   * Store Garmin OAuth tokens for a user
+   * Store Garmin credentials for a user
    */
-  async storeGarminTokens(userId: string, tokensB64: string): Promise<boolean> {
+  async storeGarminCredentials(userId: string, username: string, password: string): Promise<boolean> {
     try {
       if (!(await this.ensureToken())) {
         return false;
       }
 
-      await this.client.post(`/v1/pace42/data/garmin-tokens/${userId}`, {
+      await this.client.post(`/v1/pace42/data/garmin-credentials/${userId}`, {
         data: {
-          tokens_b64: tokensB64,
+          username,
+          password,
           user_id: userId,
           created_at: new Date().toISOString(),
         },
       });
 
-      logger.info('Garmin tokens stored in Vault', { userId });
+      logger.info('Garmin credentials stored in Vault', { userId });
       return true;
     } catch (error) {
-      logger.error('Failed to store Garmin tokens', { error, userId });
+      logger.error('Failed to store Garmin credentials', { error, userId });
       return false;
     }
   }
 
   /**
-   * Get Garmin OAuth tokens for a user
+   * Get Garmin credentials for a user
    */
-  async getGarminTokens(userId: string): Promise<{ tokens_b64: string; created_at: string } | null> {
+  async getGarminCredentials(userId: string): Promise<{ username: string; password: string } | null> {
     try {
       if (!(await this.ensureToken())) {
         return null;
       }
 
-      const response = await this.client.get(`/v1/pace42/data/garmin-tokens/${userId}`);
+      const response = await this.client.get(`/v1/pace42/data/garmin-credentials/${userId}`);
       const data = response.data?.data?.data;
 
-      if (!data?.tokens_b64) {
+      if (!data?.username || !data?.password) {
         return null;
       }
 
       return {
-        tokens_b64: data.tokens_b64,
-        created_at: data.created_at,
+        username: data.username,
+        password: data.password,
       };
     } catch (error: any) {
       if (error.response?.status === 404) {
         return null;
       }
-      logger.error('Failed to get Garmin tokens', { error, userId });
+      logger.error('Failed to get Garmin credentials', { error, userId });
       return null;
     }
   }
 
   /**
-   * Delete Garmin OAuth tokens for a user
+   * Delete Garmin credentials for a user
    */
-  async deleteGarminTokens(userId: string): Promise<boolean> {
+  async deleteGarminCredentials(userId: string): Promise<boolean> {
     try {
       if (!(await this.ensureToken())) {
         return false;
       }
 
-      await this.client.delete(`/v1/pace42/data/garmin-tokens/${userId}`);
-      logger.info('Garmin tokens deleted from Vault', { userId });
+      await this.client.delete(`/v1/pace42/data/garmin-credentials/${userId}`);
+      logger.info('Garmin credentials deleted from Vault', { userId });
       return true;
     } catch (error) {
-      logger.error('Failed to delete Garmin tokens', { error, userId });
+      logger.error('Failed to delete Garmin credentials', { error, userId });
       return false;
     }
   }

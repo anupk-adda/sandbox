@@ -2,23 +2,28 @@
 > running-coach-backend@1.0.0 start
 > node dist/server.js
 
-[dotenv@17.3.1] injecting env (8) from ../config/.env -- tip: ⚙️  override existing env vars with { override: true }
-13:59:04 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
-13:59:04 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
-13:59:04 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
-13:59:04 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
-13:59:04 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-13:59:04 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
-13:59:04 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
-13:59:04 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
+[dotenv@17.3.1] injecting env (6) from ../config/.env -- tip: ⚙️  enable debug logging with { debug: true }
+Warning: Environment variable WATSONX_API_URL is not set
+Warning: Environment variable WATSONX_PROJECT_ID is not set
+Warning: Environment variable WATSONX_API_KEY is not set
+23:19:13 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Chat routes module loaded {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
+23:19:13 [[32minfo[39m]: Registering chat routes {"service":"running-coach-backend","path":"/api/v1/chat"}
+23:19:13 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Chat routes registered successfully {"service":"running-coach-backend"}
+23:19:13 [[33mwarn[39m]: Vault not configured, using fallback mode {"service":"running-coach-backend"}
+23:19:13 [[33mwarn[39m]: Vault not configured, using fallback mode {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Connecting to database... {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
+23:19:13 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend","path":"./database/running_coach.db"}
+23:19:13 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
+23:19:13 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Database connected successfully {"service":"running-coach-backend"}
+23:19:13 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
+23:19:13 [[32minfo[39m]: Server started successfully {"service":"running-coach-backend","host":"localhost","port":3000,"environment":"development","url":"http://localhost:3000"}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏃 Running Coach Backend API
@@ -28,49 +33,7 @@
   Environment: development
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-13:59:06 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
-13:59:06 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
-13:59:06 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-13:59:06 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-13:59:06 [[32minfo[39m]: Generated token pair {"service":"running-coach-backend","userId":"798a0d3c-7212-4c67-aa64-4a45eadf02ba","rememberMe":false,"sessionId":"ae965318-556b-4173-990d-b2e81c9c6ab2"}
-13:59:06 [[32minfo[39m]: Generated token pair {"service":"running-coach-backend","userId":"798a0d3c-7212-4c67-aa64-4a45eadf02ba","rememberMe":false,"sessionId":"ae965318-556b-4173-990d-b2e81c9c6ab2"}
-13:59:06 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"798a0d3c-7212-4c67-aa64-4a45eadf02ba","username":"garminuser@test.com"}
-13:59:06 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"798a0d3c-7212-4c67-aa64-4a45eadf02ba","username":"garminuser@test.com"}
-13:59:06 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/auth/me","ip":"::1"}
-13:59:06 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/auth/me","ip":"::1"}
-13:59:06 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-13:59:06 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:30 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
-14:00:30 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
-14:00:30 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
-14:00:30 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
-14:00:30 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:30 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:31 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/logout","ip":"::1"}
-14:00:31 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/logout","ip":"::1"}
-14:00:31 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:31 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:31 [[32minfo[39m]: Revoked all sessions for user {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad"}
-14:00:31 [[32minfo[39m]: Revoked all sessions for user {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad"}
-14:00:31 [[32minfo[39m]: User logged out {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad"}
-14:00:31 [[32minfo[39m]: User logged out {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad"}
-14:00:31 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
-14:00:31 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
-14:00:35 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
-14:00:35 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/health","ip":"::1"}
-14:00:40 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
-14:00:40 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"POST","path":"/api/v1/auth/login","ip":"::1"}
-14:00:40 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:40 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:40 [[32minfo[39m]: Generated token pair {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","rememberMe":false,"sessionId":"f609b25c-904c-4b20-9edc-f172c5dee75d"}
-14:00:40 [[32minfo[39m]: Generated token pair {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","rememberMe":false,"sessionId":"f609b25c-904c-4b20-9edc-f172c5dee75d"}
-14:00:40 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup","rememberMe":false}
-14:00:40 [[32minfo[39m]: User logged in {"service":"running-coach-backend","userId":"2548431b-242e-42a6-9c44-38f1798b56ad","username":"anup","rememberMe":false}
-14:00:40 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
-14:00:40 [[32minfo[39m]: Incoming request {"service":"running-coach-backend","method":"GET","path":"/api/v1/training-plans/active","ip":"::1"}
-14:00:40 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:00:40 [[33mwarn[39m]: Using fallback JWT secrets (Vault not available) {"service":"running-coach-backend"}
-14:03:03 [[32minfo[39m]: SIGTERM received, shutting down gracefully {"service":"running-coach-backend"}
-14:03:03 [[32minfo[39m]: SIGTERM received, shutting down gracefully {"service":"running-coach-backend"}
-14:03:03 [[32minfo[39m]: Database connection closed {"service":"running-coach-backend"}
-14:03:03 [[32minfo[39m]: Database connection closed {"service":"running-coach-backend"}
+23:19:14 [[32minfo[39m]: SIGINT received, shutting down gracefully {"service":"running-coach-backend"}
+23:19:14 [[32minfo[39m]: SIGINT received, shutting down gracefully {"service":"running-coach-backend"}
+23:19:14 [[32minfo[39m]: Database connection closed {"service":"running-coach-backend"}
+23:19:14 [[32minfo[39m]: Database connection closed {"service":"running-coach-backend"}

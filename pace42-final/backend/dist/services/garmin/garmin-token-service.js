@@ -1,12 +1,17 @@
 /**
  * Garmin Token Service
- * Handles token exchange and Vault storage for Garmin OAuth tokens
+ * Handles credential storage in Vault and on-demand token exchange
  */
 import { spawn } from 'child_process';
 import { logger } from '../../utils/logger.js';
 import { vaultService } from '../vault/vault-service.js';
 /**
  * Service for managing Garmin OAuth tokens
+ *
+ * Architecture:
+ * - Store credentials in Vault (one-time during connect)
+ * - Exchange credentials for tokens on-demand (when fetching data)
+ * - Tokens are temporary, credentials are permanent
  */
 export class GarminTokenService {
     mcpPythonPath;
@@ -18,23 +23,59 @@ export class GarminTokenService {
             '/Users/anupk/devops/mcp/garmin_mcp/garmin_mcp_server.py';
     }
     /**
-     * Exchange credentials for OAuth tokens.
-     * Spawns MCP server, logs in, extracts tokens, stores in Vault.
+     * Store Garmin credentials in Vault (called during connect)
      */
-    async exchangeCredentialsForTokens(userId, credentials) {
+    async storeCredentials(userId, credentials) {
         try {
-            logger.info(`Starting token exchange for user ${userId}`);
-            // 1. Clear any existing tokens to force fresh login
+            logger.info(`Storing Garmin credentials for user ${userId}`);
+            const stored = await vaultService.storeGarminCredentials(userId, credentials.email, credentials.password);
+            if (!stored) {
+                logger.error('Failed to store credentials in Vault');
+                return false;
+            }
+            logger.info(`Credentials stored for user ${userId}`);
+            return true;
+        }
+        catch (error) {
+            logger.error(`Failed to store credentials for user ${userId}:`, { error });
+            return false;
+        }
+    }
+    /**
+     * Get credentials from Vault (called before token exchange)
+     */
+    async getCredentials(userId) {
+        try {
+            const creds = await vaultService.getGarminCredentials(userId);
+            if (creds) {
+                logger.info(`Retrieved credentials for user ${userId}`);
+                return { email: creds.username, password: creds.password };
+            }
+            return null;
+        }
+        catch (error) {
+            logger.error(`Failed to get credentials for user ${userId}:`, { error });
+            return null;
+        }
+    }
+    /**
+     * Exchange credentials for OAuth tokens (on-demand)
+     * Called every time we need to fetch data from Garmin
+     */
+    async exchangeCredentialsForTokens(userId) {
+        try {
+            // 1. Get credentials from Vault
+            const credentials = await this.getCredentials(userId);
+            if (!credentials) {
+                return { success: false, error: 'No Garmin credentials found' };
+            }
+            logger.info(`Exchanging credentials for tokens for user ${userId}`);
+            // 2. Clear any existing tokens to force fresh login
             await this.clearTokenStore();
-            // 2. Spawn MCP server with credentials to perform login
+            // 3. Spawn MCP server with credentials to perform login
             const tokens = await this.performLoginAndExtractTokens(credentials);
             if (!tokens) {
                 return { success: false, error: 'Failed to obtain tokens from Garmin' };
-            }
-            // 3. Store tokens in Vault
-            const stored = await vaultService.storeGarminTokens(userId, tokens);
-            if (!stored) {
-                return { success: false, error: 'Failed to store tokens in Vault' };
             }
             // 4. Clear local token store for security
             await this.clearTokenStore();
@@ -44,6 +85,20 @@ export class GarminTokenService {
         catch (error) {
             logger.error(`Token exchange failed for user ${userId}:`, { error });
             return { success: false, error: String(error) };
+        }
+    }
+    /**
+     * Delete credentials (called during disconnect)
+     */
+    async deleteCredentials(userId) {
+        try {
+            await vaultService.deleteGarminCredentials(userId);
+            logger.info(`Credentials deleted for user ${userId}`);
+            return true;
+        }
+        catch (error) {
+            logger.error(`Failed to delete credentials for user ${userId}:`, { error });
+            return false;
         }
     }
     /**
@@ -140,18 +195,6 @@ export class GarminTokenService {
         }
         catch (error) {
             logger.warn('Failed to clear token store:', { error });
-        }
-    }
-    /**
-     * Delete tokens from Vault (on disconnect)
-     */
-    async deleteTokens(userId) {
-        try {
-            return await vaultService.deleteGarminTokens(userId);
-        }
-        catch (error) {
-            logger.error(`Failed to delete tokens for user ${userId}:`, { error });
-            return false;
         }
     }
 }

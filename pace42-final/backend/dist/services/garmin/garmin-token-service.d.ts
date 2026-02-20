@@ -1,6 +1,6 @@
 /**
  * Garmin Token Service
- * Handles token exchange and Vault storage for Garmin OAuth tokens
+ * Handles credential storage in Vault and on-demand token exchange
  */
 export interface GarminCredentials {
     email: string;
@@ -13,16 +13,33 @@ export interface TokenExchangeResult {
 }
 /**
  * Service for managing Garmin OAuth tokens
+ *
+ * Architecture:
+ * - Store credentials in Vault (one-time during connect)
+ * - Exchange credentials for tokens on-demand (when fetching data)
+ * - Tokens are temporary, credentials are permanent
  */
 export declare class GarminTokenService {
     private mcpPythonPath;
     private mcpServerPath;
     constructor();
     /**
-     * Exchange credentials for OAuth tokens.
-     * Spawns MCP server, logs in, extracts tokens, stores in Vault.
+     * Store Garmin credentials in Vault (called during connect)
      */
-    exchangeCredentialsForTokens(userId: string, credentials: GarminCredentials): Promise<TokenExchangeResult>;
+    storeCredentials(userId: string, credentials: GarminCredentials): Promise<boolean>;
+    /**
+     * Get credentials from Vault (called before token exchange)
+     */
+    getCredentials(userId: string): Promise<GarminCredentials | null>;
+    /**
+     * Exchange credentials for OAuth tokens (on-demand)
+     * Called every time we need to fetch data from Garmin
+     */
+    exchangeCredentialsForTokens(userId: string): Promise<TokenExchangeResult>;
+    /**
+     * Delete credentials (called during disconnect)
+     */
+    deleteCredentials(userId: string): Promise<boolean>;
     /**
      * Perform login with MCP server and extract tokens
      */
@@ -35,10 +52,6 @@ export declare class GarminTokenService {
      * Clear token store files
      */
     private clearTokenStore;
-    /**
-     * Delete tokens from Vault (on disconnect)
-     */
-    deleteTokens(userId: string): Promise<boolean>;
 }
 export declare const garminTokenService: GarminTokenService;
 //# sourceMappingURL=garmin-token-service.d.ts.map
