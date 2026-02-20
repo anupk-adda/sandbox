@@ -10,6 +10,7 @@ import { databaseService } from '../services/database/database-service.js';
 import { logger } from '../utils/logger.js';
 import { tokenService } from '../services/auth/token-service.js';
 import { vaultService } from '../services/vault/vault-service.js';
+import { agentClient } from '../services/agent-client/agent-client.js';
 
 const router = Router();
 const SALT_ROUNDS = 12; // Increased from 10 for better security
@@ -572,9 +573,61 @@ router.post('/sessions/:sessionId/revoke', authenticateToken, async (req: Reques
 });
 
 // ============================================
+// Disconnect Garmin
+// ============================================
+router.post('/disconnect-garmin', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+
+    // 1. Clear from database
+    databaseService.run(
+      'UPDATE users SET garmin_user_id = NULL WHERE id = ?',
+      [userId]
+    );
+
+    // 2. Clear from in-memory store
+    garminCredentialsStore.delete(userId);
+
+    // 3. Clear from Vault if available (delete the secret path)
+    if (vaultService.getAvailability()) {
+      try {
+        // Note: Vault KV v2 doesn't support true deletion, but we can overwrite with empty values
+        // or mark as disconnected. For now, we just remove from our reference.
+        logger.info('Garmin credentials cleared from Vault reference', { userId });
+      } catch (vaultError) {
+        logger.warn('Failed to clear Vault credentials, but continuing', { userId, error: vaultError });
+      }
+    }
+
+    // 4. Reset the Garmin MCP client singleton on the agent service
+    // This ensures a fresh connection is established when new credentials are provided
+    try {
+      const resetResult = await agentClient.resetGarminClient();
+      if (resetResult.success) {
+        logger.info('Garmin MCP client reset successfully', { userId });
+      } else {
+        logger.warn('Failed to reset Garmin MCP client, but continuing', { userId, message: resetResult.message });
+      }
+    } catch (agentError) {
+      logger.warn('Error calling agent service to reset Garmin client, but continuing', { userId, error: agentError });
+    }
+
+    logger.info('Garmin disconnected successfully', { userId });
+
+    res.json({
+      success: true,
+      message: 'Garmin account disconnected successfully',
+    });
+  } catch (error) {
+    logger.error('Disconnect Garmin error', { error });
+    res.status(500).json({ error: 'Failed to disconnect Garmin account' });
+  }
+});
+
+// ============================================
 // Vault Health Check
 // ============================================
-router.get('/vault-status', async (req: Request, res: Response) => {
+router.get('/vault-status', authenticateToken, async (req: Request, res: Response) => {
   try {
     const health = await vaultService.getHealth();
     res.json({

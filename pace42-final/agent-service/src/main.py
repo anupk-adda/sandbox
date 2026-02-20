@@ -122,6 +122,24 @@ async def health_check():
         "llm_provider": config.get("llm", {}).get("provider", "watsonx")
     }
 
+# Reset Garmin MCP client endpoint (called when user disconnects Garmin)
+@app.post("/reset-garmin-client")
+async def reset_garmin_client_endpoint():
+    """
+    Reset the Garmin MCP client singleton
+    
+    This should be called when a user disconnects their Garmin account
+    to ensure a fresh connection is established on next use.
+    """
+    try:
+        from .mcp.garmin_client_async import reset_garmin_client
+        reset_garmin_client()
+        logger.info("Garmin MCP client reset successfully")
+        return {"status": "success", "message": "Garmin client reset successfully"}
+    except Exception as e:
+        logger.error(f"Failed to reset Garmin client: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to reset Garmin client: {str(e)}")
+
 # Analysis endpoint
 @app.post("/analyze", response_model=AnalysisResponse)
 async def analyze_run(request: AnalysisRequest):

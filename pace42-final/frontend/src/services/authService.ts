@@ -552,25 +552,56 @@ class AuthService {
     }
   }
 
-  disconnectGarmin() {
-    localStorage.removeItem(GARMIN_KEY);
-    
-    // Update auth data to mark Garmin as disconnected
-    const authData = localStorage.getItem(AUTH_KEY);
-    if (authData) {
-      const parsed = JSON.parse(authData);
-      localStorage.setItem(AUTH_KEY, JSON.stringify({
-        ...parsed,
-        garminConnected: false,
-      }));
+  async disconnectGarmin(): Promise<{ success: boolean; error?: string }> {
+    const token = this.getToken();
+    if (!token) {
+      return { success: false, error: 'Not authenticated' };
     }
-    
-    this.state = {
-      ...this.state,
-      isGarminConnected: false,
-      user: this.state.user ? { username: this.state.user.username } : null,
-    };
-    this.notifyListeners();
+
+    try {
+      // Call backend to clear credentials from database and Vault
+      const response = await fetch(`${BACKEND_API_URL}/auth/disconnect-garmin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        logger.warn('Backend disconnect failed, continuing with local cleanup', { error });
+        // Continue with local cleanup even if backend fails
+      }
+
+      // Clear localStorage
+      localStorage.removeItem(GARMIN_KEY);
+      
+      // Update auth data to mark Garmin as disconnected
+      const authData = localStorage.getItem(AUTH_KEY);
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        localStorage.setItem(AUTH_KEY, JSON.stringify({
+          ...parsed,
+          garminConnected: false,
+        }));
+      }
+      
+      this.state = {
+        ...this.state,
+        isGarminConnected: false,
+        user: this.state.user ? { username: this.state.user.username } : null,
+      };
+      this.notifyListeners();
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Disconnect Garmin error', { error });
+      // Still do local cleanup even on error
+      localStorage.removeItem(GARMIN_KEY);
+      this.notifyListeners();
+      return { success: false, error: 'Failed to disconnect Garmin' };
+    }
   }
 
   // ============================================

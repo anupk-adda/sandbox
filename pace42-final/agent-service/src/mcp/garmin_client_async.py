@@ -478,6 +478,17 @@ def get_garmin_client_async() -> GarminMCPClientAsync:
     return _garmin_client
 
 
+def reset_garmin_client() -> None:
+    """Reset the Garmin MCP client singleton
+    
+    This should be called when a user disconnects their Garmin account
+    to ensure a fresh connection is established on next use.
+    """
+    global _garmin_client
+    _garmin_client = None
+    logger.info("Garmin MCP client singleton reset")
+
+
 # Synchronous wrapper functions for use in non-async code
 def get_activities_sync(
     start_date: Optional[str] = None,

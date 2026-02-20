@@ -295,8 +295,8 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
     window.location.reload();
   };
 
-  const handleDisconnectGarmin = () => {
-    authService.disconnectGarmin();
+  const handleDisconnectGarmin = async () => {
+    await authService.disconnectGarmin();
     window.location.reload();
   };
 
