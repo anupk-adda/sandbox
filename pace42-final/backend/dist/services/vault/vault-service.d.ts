@@ -71,6 +71,21 @@ declare class VaultService {
      */
     deleteRefreshToken(userId: string): Promise<boolean>;
     /**
+     * Store Garmin OAuth tokens for a user
+     */
+    storeGarminTokens(userId: string, tokensB64: string): Promise<boolean>;
+    /**
+     * Get Garmin OAuth tokens for a user
+     */
+    getGarminTokens(userId: string): Promise<{
+        tokens_b64: string;
+        created_at: string;
+    } | null>;
+    /**
+     * Delete Garmin OAuth tokens for a user
+     */
+    deleteGarminTokens(userId: string): Promise<boolean>;
+    /**
      * Get Vault health status
      */
     getHealth(): Promise<{

@@ -22,15 +22,16 @@ class CurrentRunAnalyzer(FlexibleRunningAgent):
     Inherits from FlexibleRunningAgent for multi-step data gathering and self-correction.
     """
     
-    def __init__(self, llm_provider: Optional[WatsonxProvider] = None):
+    def __init__(self, llm_provider: Optional[WatsonxProvider] = None, user_id: Optional[str] = None):
         """
         Initialize Current Run Analyzer
         
         Args:
             llm_provider: LLM provider instance (creates new if not provided)
+            user_id: Optional user ID for user-scoped data access
         """
         llm = llm_provider or WatsonxProvider()
-        super().__init__(llm, "CurrentRunAnalyzer", "single")
+        super().__init__(llm, "CurrentRunAnalyzer", "single", user_id=user_id)
         self.formatter = RunAnalysisFormatter()
     
     async def analyze_latest_run(self) -> Dict[str, Any]:

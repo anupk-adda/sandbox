@@ -3,7 +3,7 @@ Running Coach Agent Service
 FastAPI application for LangGraph-based multi-agent coaching system
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
@@ -193,9 +193,14 @@ async def analyze_single_run(request: RunActivity):
         logger.error(f"Run analysis error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+def get_user_id_from_request(request) -> Optional[str]:
+    """Extract user ID from request headers"""
+    return request.headers.get('X-User-ID')
+
+
 # Endpoint to analyze latest run from Garmin
 @app.post("/analyze-latest-run")
-async def analyze_latest_garmin_run():
+async def analyze_latest_garmin_run(request: Request):
     """
     Fetch and analyze the latest run from Garmin
     
@@ -203,8 +208,18 @@ async def analyze_latest_garmin_run():
     and analyzes it using the Current Run Analyzer agent
     """
     try:
-        # Fetch and analyze latest run from Garmin (await async method)
-        analysis = await current_run_analyzer.analyze_latest_run()
+        user_id = get_user_id_from_request(request)
+        logger.info(f"Analyzing latest run for user: {user_id}")
+        
+        # Use user-scoped analyzer if user_id provided
+        if user_id:
+            from .agents.current_run_analyzer import CurrentRunAnalyzer
+            from .llm import get_llm_provider
+            user_analyzer = CurrentRunAnalyzer(get_llm_provider(), user_id=user_id)
+            analysis = await user_analyzer.analyze_latest_run()
+        else:
+            # Fallback to default analyzer
+            analysis = await current_run_analyzer.analyze_latest_run()
         
         return {
             "status": "success",

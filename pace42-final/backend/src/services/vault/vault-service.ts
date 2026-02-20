@@ -305,6 +305,78 @@ class VaultService {
   }
 
   /**
+   * Store Garmin OAuth tokens for a user
+   */
+  async storeGarminTokens(userId: string, tokensB64: string): Promise<boolean> {
+    try {
+      if (!(await this.ensureToken())) {
+        return false;
+      }
+
+      await this.client.post(`/v1/pace42/data/garmin-tokens/${userId}`, {
+        data: {
+          tokens_b64: tokensB64,
+          user_id: userId,
+          created_at: new Date().toISOString(),
+        },
+      });
+
+      logger.info('Garmin tokens stored in Vault', { userId });
+      return true;
+    } catch (error) {
+      logger.error('Failed to store Garmin tokens', { error, userId });
+      return false;
+    }
+  }
+
+  /**
+   * Get Garmin OAuth tokens for a user
+   */
+  async getGarminTokens(userId: string): Promise<{ tokens_b64: string; created_at: string } | null> {
+    try {
+      if (!(await this.ensureToken())) {
+        return null;
+      }
+
+      const response = await this.client.get(`/v1/pace42/data/garmin-tokens/${userId}`);
+      const data = response.data?.data?.data;
+
+      if (!data?.tokens_b64) {
+        return null;
+      }
+
+      return {
+        tokens_b64: data.tokens_b64,
+        created_at: data.created_at,
+      };
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        return null;
+      }
+      logger.error('Failed to get Garmin tokens', { error, userId });
+      return null;
+    }
+  }
+
+  /**
+   * Delete Garmin OAuth tokens for a user
+   */
+  async deleteGarminTokens(userId: string): Promise<boolean> {
+    try {
+      if (!(await this.ensureToken())) {
+        return false;
+      }
+
+      await this.client.delete(`/v1/pace42/data/garmin-tokens/${userId}`);
+      logger.info('Garmin tokens deleted from Vault', { userId });
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete Garmin tokens', { error, userId });
+      return false;
+    }
+  }
+
+  /**
    * Get Vault health status
    */
   async getHealth(): Promise<{ available: boolean; sealed: boolean; version?: string }> {

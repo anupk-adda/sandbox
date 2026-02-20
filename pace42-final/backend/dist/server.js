@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { config } from './config/config-loader.js';
 import { databaseService } from './services/database/database-service.js';
+import { vaultService } from './services/vault/vault-service.js';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middleware/error-handler.js';
 // Import routes
@@ -95,6 +96,20 @@ class Server {
     }
     async start() {
         try {
+            // Initialize Vault (if configured)
+            if (vaultService.isConfigured()) {
+                logger.info('Authenticating with Vault...');
+                const vaultReady = await vaultService.authenticate();
+                if (vaultReady) {
+                    logger.info('Vault authentication successful');
+                }
+                else {
+                    logger.warn('Vault authentication failed, using fallback mode');
+                }
+            }
+            else {
+                logger.warn('Vault not configured, using fallback mode');
+            }
             // Connect to database
             logger.info('Connecting to database...');
             await databaseService.connect(config.database.path);

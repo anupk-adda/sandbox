@@ -9,6 +9,8 @@ import { databaseService } from '../services/database/database-service.js';
 import { logger } from '../utils/logger.js';
 import { tokenService } from '../services/auth/token-service.js';
 import { vaultService } from '../services/vault/vault-service.js';
+import { agentClient } from '../services/agent-client/agent-client.js';
+import { garminTokenService } from '../services/garmin/garmin-token-service.js';
 const router = Router();
 const SALT_ROUNDS = 12; // Increased from 10 for better security
 // In-memory store for Garmin credentials (temporary until fully migrated to Vault)
@@ -344,33 +346,19 @@ router.post('/validate-garmin', authenticateToken, async (req, res) => {
         if (!garminUsername || !garminPassword) {
             return res.status(400).json({ error: 'Garmin username and password are required' });
         }
-        // Store in Vault if available, otherwise use in-memory store
-        if (vaultService.getAvailability()) {
-            const encryptedUsername = await vaultService.encryptData(garminUsername);
-            const encryptedPassword = await vaultService.encryptData(garminPassword);
-            if (encryptedUsername && encryptedPassword) {
-                // Store encrypted credentials reference
-                databaseService.run('UPDATE users SET garmin_user_id = ? WHERE id = ?', [garminUsername, userId]);
-                logger.info('Garmin credentials encrypted and stored in Vault', { userId });
-            }
-            else {
-                // Fallback to in-memory store
-                garminCredentialsStore.set(userId, {
-                    username: garminUsername,
-                    password: garminPassword,
-                });
-            }
-        }
-        else {
-            // Store in memory (for development without Vault)
-            garminCredentialsStore.set(userId, {
-                username: garminUsername,
-                password: garminPassword,
+        // Exchange credentials for OAuth tokens and store in Vault
+        logger.info('Starting Garmin token exchange', { userId, garminUsername });
+        const exchangeResult = await garminTokenService.exchangeCredentialsForTokens(userId, { email: garminUsername, password: garminPassword });
+        if (!exchangeResult.success) {
+            logger.error('Token exchange failed', { userId, error: exchangeResult.error });
+            return res.status(400).json({
+                valid: false,
+                error: exchangeResult.error || 'Failed to connect to Garmin. Please check your credentials.'
             });
         }
         // Update user record
         databaseService.run('UPDATE users SET garmin_user_id = ? WHERE id = ?', [garminUsername, userId]);
-        logger.info('Garmin credentials validated', { userId, garminUsername });
+        logger.info('Garmin credentials validated and tokens stored', { userId, garminUsername });
         res.json({
             valid: true,
             message: 'Garmin credentials validated successfully',
@@ -443,9 +431,52 @@ router.post('/sessions/:sessionId/revoke', authenticateToken, async (req, res) =
     }
 });
 // ============================================
+// Disconnect Garmin
+// ============================================
+router.post('/disconnect-garmin', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        // 1. Clear from database
+        databaseService.run('UPDATE users SET garmin_user_id = NULL WHERE id = ?', [userId]);
+        // 2. Clear from in-memory store
+        garminCredentialsStore.delete(userId);
+        // 3. Delete OAuth tokens from Vault
+        try {
+            await garminTokenService.deleteTokens(userId);
+            logger.info('Garmin OAuth tokens deleted from Vault', { userId });
+        }
+        catch (tokenError) {
+            logger.warn('Failed to delete Garmin tokens from Vault, but continuing', { userId, error: tokenError });
+        }
+        // 4. Reset the Garmin MCP client singleton on the agent service
+        // This ensures a fresh connection is established when new credentials are provided
+        try {
+            const resetResult = await agentClient.resetGarminClient();
+            if (resetResult.success) {
+                logger.info('Garmin MCP client reset successfully', { userId });
+            }
+            else {
+                logger.warn('Failed to reset Garmin MCP client, but continuing', { userId, message: resetResult.message });
+            }
+        }
+        catch (agentError) {
+            logger.warn('Error calling agent service to reset Garmin client, but continuing', { userId, error: agentError });
+        }
+        logger.info('Garmin disconnected successfully', { userId });
+        res.json({
+            success: true,
+            message: 'Garmin account disconnected successfully',
+        });
+    }
+    catch (error) {
+        logger.error('Disconnect Garmin error', { error });
+        res.status(500).json({ error: 'Failed to disconnect Garmin account' });
+    }
+});
+// ============================================
 // Vault Health Check
 // ============================================
-router.get('/vault-status', async (req, res) => {
+router.get('/vault-status', authenticateToken, async (req, res) => {
     try {
         const health = await vaultService.getHealth();
         res.json({

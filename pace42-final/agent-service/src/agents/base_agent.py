@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 import logging
 
 from ..mcp.garmin_client_async import get_garmin_client_async
+from ..mcp.garmin_client_v2 import get_client_for_user
 from ..data.normalizer import GarminDataNormalizer
 from ..formatting.output_formatter import OutputFormatter
 
@@ -27,7 +28,7 @@ class FlexibleRunningAgent(ABC):
     - System prompt
     """
     
-    def __init__(self, llm_provider, agent_name: str, data_scope: str):
+    def __init__(self, llm_provider, agent_name: str, data_scope: str, user_id: Optional[str] = None):
         """
         Initialize flexible agent.
         
@@ -35,16 +36,24 @@ class FlexibleRunningAgent(ABC):
             llm_provider: LLM provider instance (watsonx)
             agent_name: Name of the agent (for logging)
             data_scope: Scope of data ("single", "recent", "trend")
+            user_id: Optional user ID for user-scoped data access
         """
         self.llm = llm_provider
         self.agent_name = agent_name
         self.data_scope = data_scope
-        self.mcp_client = get_garmin_client_async()
+        self.user_id = user_id
+        
+        # Use user-scoped client if user_id provided, otherwise fallback to singleton
+        if user_id:
+            self.mcp_client = get_client_for_user(user_id)
+            self.logger.info(f"Initialized {agent_name} with scope: {data_scope} for user: {user_id}")
+        else:
+            self.mcp_client = get_garmin_client_async()
+            self.logger.info(f"Initialized {agent_name} with scope: {data_scope}")
+        
         self.normalizer = GarminDataNormalizer()
         self.formatter = OutputFormatter()
         self.logger = logger
-        
-        self.logger.info(f"Initialized {agent_name} with scope: {data_scope}")
     
     async def gather_data(self, user_request: str, num_activities: int = 1) -> Dict[str, Any]:
         """

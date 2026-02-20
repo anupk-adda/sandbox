@@ -677,7 +677,7 @@ router.post('/', async (req, res, next) => {
                 agent: weather.agent || 'Weather Agent',
                 confidence: intent.confidence,
                 weather: weather.weather,
-                charts: weather.charts || [],
+                charts: [],
             };
             contextManager.recordMessage(conversationId, 'assistant', response.response);
             contextManager.recordAnalysis(conversationId, intent.type, response.agent, response.response, response.weather ? { weather: response.weather } : undefined);
@@ -701,6 +701,7 @@ router.post('/', async (req, res, next) => {
                     agent: cached.agent || 'Cached Analysis',
                     confidence: intent.confidence,
                     charts: cachedCharts,
+                    runSamples: cached?.analysis_payload?.run_samples || cached?.analysis_payload?.runSamples,
                 };
                 contextManager.recordMessage(conversationId, 'assistant', response.response);
                 logger.info('Returning cached analysis', { intent: intent.type, agent: response.agent });
@@ -747,9 +748,17 @@ router.post('/', async (req, res, next) => {
                     agent: agentUsed,
                     confidence: intent.confidence,
                     charts: analysis.charts || analysis.chart_data,
+                    runSamples: analysis.run_samples || analysis.runSamples,
                 };
                 contextManager.recordMessage(conversationId, 'assistant', response.response);
-                contextManager.recordAnalysis(conversationId, intent.type, agentUsed, response.response, response.charts ? { charts: response.charts } : undefined);
+                const analysisPayload = {};
+                if (response.charts && response.charts.length > 0) {
+                    analysisPayload.charts = response.charts;
+                }
+                if (response.runSamples && response.runSamples.length > 0) {
+                    analysisPayload.run_samples = response.runSamples;
+                }
+                contextManager.recordAnalysis(conversationId, intent.type, agentUsed, response.response, Object.keys(analysisPayload).length ? analysisPayload : undefined);
                 logger.info('Chat response prepared', {
                     agent: agentUsed,
                     responseLength: response.response.length,
@@ -791,7 +800,7 @@ router.post('/', async (req, res, next) => {
                         agent: weather.agent || 'Weather Agent',
                         confidence: intent.confidence,
                         weather: weather.weather,
-                        charts: weather.charts || [],
+                        charts: [],
                     };
                     contextManager.recordMessage(conversationId, 'assistant', response.response);
                     contextManager.recordAnalysis(conversationId, 'weather', response.agent, response.response, response.weather ? { weather: response.weather } : undefined);
