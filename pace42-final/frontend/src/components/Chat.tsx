@@ -6,8 +6,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { chatService } from '../services/chatService';
 import { authService } from '../services/authService';
-import type { Message, Chart, WeatherPayload, PlanSummary, WeeklyDetail, AssistantPrompt, TrainingSummary } from '../services/chatService';
-import { GraphWidget } from './graphs/v2/GraphWidget';
+import type { Message, WeatherPayload, PlanSummary, WeeklyDetail, AssistantPrompt, TrainingSummary, RunSamplePayload } from '../services/chatService';
+import { RunningConditionsWidget } from '../features/weather/RunningConditionsWidget';
+import type { HourlyWeather } from '../features/weather/weatherUtils';
+import { RunAnalysisInlineCard } from '../features/run-analysis/RunAnalysisInlineCard';
+import type { RunSample } from '../features/run-analysis/runAnalysisUtils';
 import { Logo } from './auth/Logo';
 import { 
   Send, 
@@ -15,7 +18,6 @@ import {
   TrendingUp, 
   Target, 
   BarChart3, 
-  Sun, 
   LogOut, 
   Watch,
   AlertCircle,
@@ -42,8 +44,8 @@ const MOTIVATIONAL_QUOTES = [
 ];
 
 type ChatMessage = Message & {
-  charts?: Chart[];
   weather?: WeatherPayload;
+  runSamples?: RunSamplePayload[];
   planSummary?: PlanSummary;
   weeklyDetail?: WeeklyDetail;
   trainingSummary?: TrainingSummary;
@@ -214,8 +216,8 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
       const assistantMessage: ChatMessage = {
         role: 'assistant',
         content: response.response,
-        charts: response.charts,
         weather: response.weather,
+        runSamples: response.runSamples,
         planSummary: response.planSummary,
         weeklyDetail: response.weeklyDetail,
         trainingSummary: response.trainingSummary,
@@ -337,6 +339,28 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
     }
   };
 
+  const mapWeatherToHourly = (weather?: WeatherPayload): HourlyWeather[] => {
+    if (!weather?.hours) return [];
+    return weather.hours.map((hour) => ({
+      time: hour.time,
+      temperatureC: hour.details?.temperature,
+      humidity: hour.details?.humidity,
+      windKph: hour.details?.wind_speed,
+      precipProbability: hour.details?.precip_prob,
+      precipitationMm: hour.details?.precipitation,
+      lightningProbability: undefined,
+    }));
+  };
+
+  const mapRunSamples = (samples?: RunSamplePayload[]): RunSample[] => {
+    if (!samples) return [];
+    return samples.map((sample) => ({
+      timestamp: sample.timestamp,
+      distanceKm: sample.distance_km,
+      metrics: sample.metrics,
+    }));
+  };
+
   // Render components
   const renderPlanSummaryCard = (plan?: PlanSummary) => {
     if (!plan) return null;
@@ -420,7 +444,7 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
     );
   };
 
-  const renderTrainingSummaryCard = (summary?: TrainingSummary, charts?: Chart[]) => {
+  const renderTrainingSummaryCard = (summary?: TrainingSummary) => {
     if (!summary) return null;
     return (
       <div className="glass-card p-5 mb-4">
@@ -428,7 +452,6 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
           <TrendingUp className="w-4 h-4 text-[#00D4AA]" />
           Recent Runs
         </h3>
-        <GraphWidget charts={charts} />
         <div className="mt-4 space-y-2">
           {summary.runs.map((run, idx) => (
             <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
@@ -440,54 +463,6 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
             </div>
           ))}
         </div>
-      </div>
-    );
-  };
-
-  const renderWeatherCard = (weather: WeatherPayload | undefined) => {
-    if (!weather || !weather.hours || weather.hours.length === 0) {
-      return null;
-    }
-
-    return (
-      <div className="glass-card p-5 mb-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-semibold flex items-center gap-2">
-            <Sun className="w-4 h-4 text-[#00D4AA]" />
-            Running Conditions
-          </h3>
-          <span className="text-white/50 text-sm">{weather.location_label || 'Near you'}</span>
-        </div>
-        
-        {weather.current_time && (
-          <div className="text-white/40 text-xs mb-3">As of {weather.current_time}</div>
-        )}
-        
-        <div className="text-white/80 text-sm mb-2">
-          <strong>{weather.summary}</strong>
-        </div>
-        {weather.recommendation && (
-          <div className="text-white/60 text-sm mb-4">{weather.recommendation}</div>
-        )}
-        
-        <div className="flex gap-1 h-24 items-end">
-          {weather.hours.map((hour, idx) => (
-            <div key={idx} className="flex-1 flex flex-col items-center">
-              <div 
-                className={`w-full rounded-t ${
-                  hour.label === 'Good' ? 'bg-[#00D4AA]' : 
-                  hour.label === 'Fair' ? 'bg-yellow-500' : 'bg-red-500'
-                }`}
-                style={{ height: `${Math.max(20, hour.score)}%` }}
-              />
-              <span className="text-white/40 text-xs mt-1">{hour.time}</span>
-            </div>
-          ))}
-        </div>
-        
-        {weather.attribution && (
-          <div className="text-white/30 text-xs mt-3">{weather.attribution}</div>
-        )}
       </div>
     );
   };
@@ -590,7 +565,10 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
             <div className={`flex-1 max-w-[80%] ${message.role === 'user' ? 'text-right' : ''}`}>
               {message.role === 'assistant' ? (() => {
                 const hasPlanContent = Boolean(message.planSummary) || Boolean(message.weeklyDetail);
-                const isAnalysis = Boolean(message.charts?.length) || /(^|\n)##?\s/.test(message.content);
+                const hourlyWeather = mapWeatherToHourly(message.weather);
+                const shouldShowWeather = Boolean(message.weather) || message.intent === 'weather';
+                const runSamples = mapRunSamples(message.runSamples);
+                const isAnalysis = /(^|\n)##?\s/.test(message.content);
                 const highlights = extractHighlights(message.content);
 
                 if (!isAnalysis && !hasPlanContent) {
@@ -599,7 +577,12 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
                       <div className="glass-card p-4 text-white/80 text-left">
                         {message.content}
                       </div>
-                      {renderWeatherCard(message.weather)}
+                      {shouldShowWeather && (
+                        <RunningConditionsWidget
+                          hourly={hourlyWeather}
+                          locationLabel={message.weather?.location_label || 'Near you'}
+                        />
+                      )}
                     </>
                   );
                 }
@@ -611,9 +594,15 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
                         {message.content}
                       </div>
                     )}
-                    {renderTrainingSummaryCard(message.trainingSummary, message.charts)}
+                    {renderTrainingSummaryCard(message.trainingSummary)}
                     {renderPlanSummaryCard(message.planSummary)}
                     {renderWeeklyDetailCard(message.weeklyDetail)}
+                    {shouldShowWeather && (
+                      <RunningConditionsWidget
+                        hourly={hourlyWeather}
+                        locationLabel={message.weather?.location_label || 'Near you'}
+                      />
+                    )}
                     
                     {isAnalysis && highlights.length > 0 && (
                       <div className="glass-card p-4 mb-4">
@@ -637,9 +626,10 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
                         </div>
                       </div>
                     )}
-                    
-                    {isAnalysis && !message.trainingSummary && renderWeatherCard(message.weather)}
-                    {isAnalysis && !message.trainingSummary && <GraphWidget charts={message.charts} />}
+
+                    {runSamples.length > 0 && (
+                      <RunAnalysisInlineCard samples={runSamples} />
+                    )}
                     
                     {isAnalysis && (
                       <details className="glass-card">

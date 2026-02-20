@@ -14,6 +14,8 @@ import DashboardSection from './sections/v2/DashboardSection';
 import FinalCTASection from './sections/v2/FinalCTASection';
 import { AuthFlow } from './components/auth/AuthFlow';
 import { DashboardSection as TrainingDashboard } from './sections/DashboardSection';
+import RunningConditionsPage from './features/weather/RunningConditionsPage';
+import RunAnalysisPage from './features/run-analysis/RunAnalysisPage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -102,6 +104,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/chat" element={<AuthFlow />} />
         <Route path="/dashboard" element={<TrainingDashboard onBack={() => window.location.href = '/chat'} />} />
+        <Route path="/conditions/running" element={<RunningConditionsPage />} />
+        <Route path="/run/analysis/:id" element={<RunAnalysisPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

@@ -18,6 +18,8 @@ export interface AgentAnalysis {
   charts?: any[];
   chart_data?: any[];
   weather?: any;
+  run_samples?: any[];
+  runSamples?: any[];
 }
 
 export interface AgentPlanResponse {

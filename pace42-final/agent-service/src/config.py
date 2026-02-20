@@ -94,7 +94,18 @@ def get_watsonx_config() -> Dict[str, Any]:
 def get_openai_config() -> Dict[str, Any]:
     """Get OpenAI specific configuration"""
     llm_config = get_llm_config()
-    return llm_config.get('openai', {})
+    config = llm_config.get('openai', {})
+    
+    # Try to fetch API key from Vault
+    try:
+        from .vault_client import get_openai_key
+        vault_key = get_openai_key()
+        if vault_key and vault_key != 'placeholder':
+            config['apiKey'] = vault_key
+    except Exception as e:
+        print(f"Warning: Could not fetch OpenAI key from Vault: {e}")
+    
+    return config
 
 def get_model_config(agent_name: str) -> Dict[str, Any]:
     """

@@ -1,7 +1,8 @@
 # pace42 Unified - Checkpoint
 
 **Date:** February 20, 2026  
-**Status:** Functional with known UI issues  
+**Version:** 1.2.2  
+**Status:** Functional with known issues  
 **Branch:** main (pace42-final)
 
 ---
@@ -13,9 +14,9 @@ Unified version of pace42.ai combining:
 - **Backend:** Working Node.js API from `anupk-adda-r42-...` with auth routes added
 - **Agent Service:** Python service from `anupk-adda-r42-...` with OpenAI integration
 
-**Known Issues:**
-- Graph rendering issues in dark theme (tooltip positioning, select dropdown colors)
-- Weather chart basic implementation needs refinement
+**Known Issues (v1.2.2):**
+- Garmin reconnect still fetches data from the previous account (MCP device binding)
+- Plan subscription flow not fully wired for dashboard module
 
 ---
 
@@ -27,7 +28,7 @@ pace42-final/
 │   ├── src/
 │   │   ├── components/       # React components
 │   │   │   ├── auth/         # Login, Signup, GarminConnect forms
-│   │   │   ├── graphs/v2/    # Chart components (SingleRunChartCard, etc.)
+│   │   │   ├── features/     # Weather + Run Analysis widgets
 │   │   │   ├── ui/           # Shadcn UI components
 │   │   │   ├── Chat.tsx      # Main chat interface
 │   │   │   ├── Chat.css      # Chat & graph styles
@@ -140,31 +141,27 @@ GET  /api/v1/training-plans/subscription-status
 POST /api/v1/training-plans/subscribe
 ```
 
-### 3. Chart Redesign (MODIFIED)
+### 3. Chart System Rebuild (v1.2.2)
 
 **Files:**
-- `agent-service/src/utils/chart_builder.py` (MODIFIED)
-- `frontend/src/components/Chat.css` (MODIFIED)
-
-**New Charts for "Analyze Last Run":**
-1. **Pace Consistency** - % deviation from average with color coding
-2. **Split Analysis** - First half vs second half comparison
-3. **Heart Rate Response** - HR trend over distance
-4. **Effort Distribution** - Relative effort score by km
-
-**Known Issues:**
-- Tooltip positioning renders below instead of above
-- Select dropdown needs dark theme styling refinements
-- Graph card styling incomplete
-
-### 4. Weather Conditions (MODIFIED)
-
-**Files:**
-- `agent-service/src/agents/weather_agent.py` (MODIFIED)
+- `frontend/src/features/run-analysis/*` (NEW)
+- `frontend/src/features/weather/*` (NEW)
+- `frontend/src/components/Chat.tsx` (MODIFIED)
+- `agent-service/src/agents/current_run_analyzer.py` (MODIFIED)
 
 **Changes:**
-- Added simple bar chart for running condition scores
-- Shows 8-hour forecast with condition scores
+- Rebuilt **Run Analysis** chart as a dual-metric overlay with dark-mode selectors and tooltip.
+- Rebuilt **Running Conditions** widget with Good/Fair/Poor bars and summary sentence.
+- Charts now render **inside assistant responses** (no separate pages required).
+- Legacy chart components archived under `backups/legacy-charts-src`.
+
+### 4. Weather Conditions (v1.2.2)
+
+**Changes:**
+- Color-coded buckets aligned to thresholds:
+  - GOOD: 10–22°C, rain <30%, no lightning, humidity <75%
+  - FAIR: 23–30°C, rain 30–60%, light rain, humidity 75–85%
+  - POOR: >30°C, rain >60%, thunder risk/heat index high, lightning detected
 
 ### 5. Unified Startup Script (NEW)
 
@@ -236,30 +233,34 @@ VITE_BACKEND_API_URL=http://localhost:3000
 
 ---
 
-## Known Issues & TODOs
+## Known Issues & TODOs (v1.2.2)
 
-### Critical
-1. **Graph Rendering**
-   - Tooltip appears below cursor instead of above
-   - Select dropdown styling incomplete (needs dark theme)
-   - Graph card borders/text colors need refinement
+### Fixed in 1.2.2
+1. **Chart Rendering**
+   - Tooltip positioning and dark-mode inputs are now consistent
+   - Weather widget color coding aligned to Good/Fair/Poor thresholds
+   - Charts embedded directly in assistant responses
 
-2. **Weather Chart**
-   - Basic implementation needs visual refinement
-   - Bar colors could be dynamic based on score
+### Critical (Pending)
+2. **Garmin Account Switch**
+   - After disconnecting and adding new Garmin credentials, data is still fetched from the old account
+   - Likely due to MCP server hardcoded device/account binding
 
-### Medium Priority
-3. **Code Cleanup Needed**
+3. **Plan Subscription Flow**
+   - Subscription state needs to drive dashboard module behavior
+
+### Medium Priority (Pending)
+4. **Code Cleanup Needed**
    - Duplicate CSS variables in index.css and Chat.css
    - Unused imports in DashboardSection.tsx
    - Backend auth routes need error handling refinement
 
-4. **Testing**
+5. **Testing**
    - No test coverage for new auth system
    - No test coverage for dashboard
 
-### Low Priority
-5. **Performance**
+### Low Priority (Pending)
+6. **Performance**
    - Frontend bundle size >500KB (code splitting recommended)
    - No lazy loading for dashboard section
 

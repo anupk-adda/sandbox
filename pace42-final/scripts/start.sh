@@ -76,21 +76,179 @@ trap cleanup SIGINT SIGTERM
 echo -e "${BLUE}🔐 Setting up HashiCorp Vault...${NC}"
 
 VAULT_DIR="$PROJECT_ROOT/vault"
-if [ -f "$VAULT_DIR/setup-vault.sh" ]; then
-    cd "$VAULT_DIR"
-    
-    # Setup Vault (starts server and configures it)
-    ./setup-vault.sh > "$PROJECT_ROOT/logs/vault-setup.log" 2>&1
-    
-    # Check if Vault is running
-    if pgrep -f "vault server" > /dev/null; then
-        echo -e "${GREEN}  ✓ Vault is running${NC}"
-        VAULT_PID=$(pgrep -f "vault server")
+INIT_FILE="$VAULT_DIR/vault-init.json"
+
+# Check if Vault needs initialization
+if [ ! -f "$INIT_FILE" ] || [ ! -s "$INIT_FILE" ]; then
+    echo -e "${YELLOW}  ⚠ Vault not initialized, running init-vault.sh...${NC}"
+    cd "$PROJECT_ROOT"
+    ./scripts/init-vault.sh > "$PROJECT_ROOT/logs/vault-setup.log" 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}  ✓ Vault initialized successfully${NC}"
     else
-        echo -e "${YELLOW}  ⚠ Vault setup incomplete, continuing without Vault${NC}"
+        echo -e "${RED}  ✗ Vault initialization failed${NC}"
+        echo "  Check logs: $PROJECT_ROOT/logs/vault-setup.log"
     fi
 else
-    echo -e "${YELLOW}  ⚠ Vault setup script not found, continuing without Vault${NC}"
+    echo -e "${GREEN}  ✓ Vault already initialized${NC}"
+fi
+
+# Check if Vault is running
+if pgrep -f "vault server" > /dev/null; then
+    echo -e "${GREEN}  ✓ Vault is running${NC}"
+    VAULT_PID=$(pgrep -f "vault server")
+else
+    # Start Vault if not running
+    if [ -f "$VAULT_DIR/vault" ]; then
+        cd "$VAULT_DIR"
+        export VAULT_ADDR='http://127.0.0.1:8200'
+        nohup ./vault server -config=vault-config.hcl > "$PROJECT_ROOT/logs/vault.log" 2>&1 &
+        sleep 3
+        if pgrep -f "vault server" > /dev/null; then
+            echo -e "${GREEN}  ✓ Vault server started${NC}"
+            VAULT_PID=$(pgrep -f "vault server")
+            
+            # Unseal Vault
+            UNSEAL_KEY=$(cat vault-init.json | python3 -c "import json,sys; print(json.load(sys.stdin)['unseal_keys_b64'][0])")
+            ./vault operator unseal "$UNSEAL_KEY" > /dev/null 2>&1
+            echo -e "${GREEN}  ✓ Vault unsealed${NC}"
+        else
+            echo -e "${YELLOW}  ⚠ Vault failed to start, continuing without Vault${NC}"
+        fi
+    else
+        echo -e "${YELLOW}  ⚠ Vault binary not found, continuing without Vault${NC}"
+    fi
+fi
+
+# ============================================
+# 1b. Update .env from Vault
+# ============================================
+if [ -f "$INIT_FILE" ] && [ -s "$INIT_FILE" ]; then
+    echo -e "${BLUE}📝 Updating .env from Vault...${NC}"
+    
+    # Extract Vault token from init file
+    VAULT_ROOT_TOKEN=$(cat "$INIT_FILE" | python3 -c "import json,sys; print(json.load(sys.stdin)['root_token'])" 2>/dev/null)
+    
+    if [ -n "$VAULT_ROOT_TOKEN" ]; then
+        ENV_FILE="$PROJECT_ROOT/config/.env"
+        
+        # Ensure config directory exists
+        mkdir -p "$PROJECT_ROOT/config"
+        
+        # Create or update .env file
+        if [ -f "$ENV_FILE" ]; then
+            # Update existing .env
+            # Remove old VAULT entries
+            sed -i.bak '/^VAULT_ADDR=/d' "$ENV_FILE" 2>/dev/null || true
+            sed -i.bak '/^VAULT_TOKEN=/d' "$ENV_FILE" 2>/dev/null || true
+            rm -f "$ENV_FILE.bak" 2>/dev/null || true
+            
+            # Add VAULT configuration after the Vault Configuration comment or at the end
+            if grep -q "HashiCorp Vault Configuration" "$ENV_FILE"; then
+                # Add after the comment block
+                sed -i.bak '/^# VAULT_TOKEN=/d' "$ENV_FILE" 2>/dev/null || true
+                sed -i.bak '/^# VAULT_ADDR=/d' "$ENV_FILE" 2>/dev/null || true
+                rm -f "$ENV_FILE.bak" 2>/dev/null || true
+                
+                # Use awk to insert after the Vault config section
+                awk '
+                    /^# ===.*Vault Configuration/ { in_vault=1 }
+                    in_vault && /^# ===/ && !seen {
+                        print
+                        seen=1
+                        next
+                    }
+                    in_vault && seen && !added && /^[^#]/ {
+                        print "VAULT_ADDR=http://127.0.0.1:8200"
+                        print "VAULT_TOKEN=" vault_token
+                        added=1
+                    }
+                    { print }
+                    END {
+                        if (!added) {
+                            print ""
+                            print "# ============================================"
+                            print "# HashiCorp Vault Configuration"
+                            print "# ============================================"
+                            print "VAULT_ADDR=http://127.0.0.1:8200"
+                            print "VAULT_TOKEN=" vault_token
+                        }
+                    }
+                ' vault_token="$VAULT_ROOT_TOKEN" "$ENV_FILE" > "$ENV_FILE.tmp" && mv "$ENV_FILE.tmp" "$ENV_FILE"
+            else
+                # Append to end of file
+                echo "" >> "$ENV_FILE"
+                echo "# ============================================" >> "$ENV_FILE"
+                echo "# HashiCorp Vault Configuration" >> "$ENV_FILE"
+                echo "# ============================================" >> "$ENV_FILE"
+                echo "VAULT_ADDR=http://127.0.0.1:8200" >> "$ENV_FILE"
+                echo "VAULT_TOKEN=$VAULT_ROOT_TOKEN" >> "$ENV_FILE"
+            fi
+        else
+            # Create new .env file with template
+            cat > "$ENV_FILE" << EOF
+# pace42 Configuration
+# Generated by start.sh - $(date)
+
+# ============================================
+# LLM Provider Settings
+# ============================================
+# OpenAI (Recommended for ease of use)
+OPENAI_API_KEY=sk-your-openai-key-here
+
+# OR WatsonX (IBM)
+# WATSONX_API_KEY=your-watsonx-key
+# WATSONX_PROJECT_ID=your-project-id
+# WATSONX_URL=https://us-south.ml.cloud.ibm.com
+
+# LLM Provider Selection (openai or watsonx)
+LLM_PROVIDER=openai
+
+# ============================================
+# Session Security
+# ============================================
+SESSION_SECRET=your-super-secret-session-key-change-this-in-production
+
+# ============================================
+# Garmin MCP Server (Optional)
+# ============================================
+# Path to your Garmin MCP server Python executable
+# GARMIN_MCP_PYTHON_PATH=/Users/anupk/devops/mcp/garmin_mcp/.venv/bin/python
+# GARMIN_MCP_SERVER_PATH=/Users/anupk/devops/mcp/garmin_mcp/garmin_mcp_server.py
+
+# ============================================
+# Environment
+# ============================================
+NODE_ENV=development
+
+# ============================================
+# HashiCorp Vault Configuration (auto-populated by start.sh)
+# ============================================
+VAULT_ADDR=http://127.0.0.1:8200
+VAULT_TOKEN=$VAULT_ROOT_TOKEN
+EOF
+        fi
+        
+        echo -e "${GREEN}  ✓ .env updated with Vault credentials${NC}"
+        
+        # Optionally fetch OpenAI key from Vault and update .env if it exists in Vault
+        export VAULT_ADDR='http://127.0.0.1:8200'
+        export VAULT_TOKEN="$VAULT_ROOT_TOKEN"
+        
+        if [ -f "$VAULT_DIR/vault" ]; then
+            OPENAI_KEY=$("$VAULT_DIR/vault" kv get -mount=pace42 api-keys 2>/dev/null | grep -A1 "openai_key" | tail -1 | awk '{print $2}' || true)
+            if [ -n "$OPENAI_KEY" ] && [ "$OPENAI_KEY" != "<value" ]; then
+                # Update OPENAI_API_KEY in .env
+                sed -i.bak "s/^OPENAI_API_KEY=.*/OPENAI_API_KEY=$OPENAI_KEY/" "$ENV_FILE" 2>/dev/null || true
+                rm -f "$ENV_FILE.bak" 2>/dev/null || true
+                echo -e "${GREEN}  ✓ OpenAI key synced from Vault${NC}"
+            fi
+        fi
+    else
+        echo -e "${YELLOW}  ⚠ Could not extract Vault token, .env not updated${NC}"
+    fi
+else
+    echo -e "${YELLOW}  ⚠ Vault init file not found, .env not updated${NC}"
 fi
 
 echo ""
@@ -288,6 +446,9 @@ echo "📝 Logs:"
 echo "   tail -f $PROJECT_ROOT/logs/backend.log"
 echo "   tail -f $PROJECT_ROOT/logs/agent-service.log"
 echo "   tail -f $PROJECT_ROOT/logs/vault-setup.log"
+echo ""
+echo "📚 Documentation:"
+echo "   STARTUP.md - Full startup and troubleshooting guide"
 echo ""
 echo "Press Ctrl+C to stop all services"
 echo ""

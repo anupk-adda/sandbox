@@ -5,7 +5,7 @@ Implements the LLM provider interface for OpenAI API
 
 from openai import AsyncOpenAI
 from typing import Dict, Any, Optional, List
-from ..config import get_llm_config
+from ..config import get_llm_config, get_openai_config
 import logging
 import os
 
@@ -18,7 +18,7 @@ class OpenAIProvider:
     def __init__(self):
         """Initialize OpenAI provider with configuration"""
         self.config = get_llm_config()
-        openai_config = self.config.get('openai', {})
+        openai_config = get_openai_config()
         
         self.api_key = openai_config.get('apiKey') or os.getenv('OPENAI_API_KEY')
         self.model = openai_config.get('model', 'gpt-4o-mini')

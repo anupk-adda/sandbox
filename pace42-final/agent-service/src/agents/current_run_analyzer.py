@@ -6,7 +6,8 @@ Refactored to use FlexibleRunningAgent base class for improved flexibility and d
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
+from datetime import datetime, timedelta, timezone
 from ..llm import WatsonxProvider
 from .base_agent import FlexibleRunningAgent
 from ..utils.response_formatter import RunAnalysisFormatter
@@ -102,6 +103,8 @@ class CurrentRunAnalyzer(FlexibleRunningAgent):
                 metrics=['pace', 'hr', 'cadence', 'power']
             )
 
+            run_samples = self._build_run_samples(activity_data)
+
             return {
                 "agent": self.agent_name,
                 "run_id": activity.get("activity_id"),
@@ -110,7 +113,8 @@ class CurrentRunAnalyzer(FlexibleRunningAgent):
                 "has_splits": bool(activity_data.get("laps")),
                 "has_hr_zones": bool(normalized.get("hr_zones", {}).get("zones")),
                 "has_weather": bool(normalized.get("weather", {}).get("available")),
-                "charts": charts
+                "charts": charts,
+                "run_samples": run_samples
             }
             
         except Exception as e:
@@ -227,6 +231,50 @@ When providing feedback, use this format:
 
 You're not just analyzing data - you're coaching a human being with goals, limitations, and feelings. Every piece of feedback should move them toward better training and performance while maintaining their motivation and enjoyment of running."""
     
+    def _build_run_samples(self, activity_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Build run samples from lap data for charting."""
+        laps = activity_data.get("laps", []) or []
+        if not laps:
+            return []
+
+        start_raw = activity_data.get("date")
+        start_dt = None
+        if isinstance(start_raw, str):
+            try:
+                start_dt = datetime.fromisoformat(start_raw.replace("Z", "+00:00"))
+            except ValueError:
+                start_dt = None
+
+        elapsed_s = 0.0
+        distance_km = 0.0
+        samples: List[Dict[str, Any]] = []
+
+        for lap in laps:
+            duration_s = float(lap.get("duration_s") or 0)
+            lap_distance = float(lap.get("distance_km") or 0)
+            elapsed_s += duration_s
+            distance_km += lap_distance
+
+            timestamp = None
+            if start_dt:
+                timestamp = (start_dt + timedelta(seconds=elapsed_s)).astimezone(timezone.utc).isoformat()
+            else:
+                # Fallback to an ISO-like timestamp based on elapsed seconds
+                timestamp = datetime.now(timezone.utc).isoformat()
+
+            samples.append({
+                "timestamp": timestamp,
+                "distance_km": round(distance_km, 3),
+                "metrics": {
+                    "heartRate": lap.get("avg_hr") or None,
+                    "pace": lap.get("pace_min_per_km") or None,
+                    "cadence": lap.get("avg_cadence") or None,
+                    "elevation": lap.get("elevation_gain") or None,
+                }
+            })
+
+        return samples
+
     def _build_analysis_prompt(self, context: str, user_request: str) -> str:
         """
         Build analysis prompt for current run.

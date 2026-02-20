@@ -29,6 +29,7 @@ export interface ChatResponse {
   agent?: string;
   confidence: number;
   charts?: Chart[];
+  runSamples?: RunSamplePayload[];
   weather?: WeatherPayload;
   planSummary?: PlanSummary;
   weeklyDetail?: WeeklyDetail;
@@ -89,6 +90,12 @@ export interface WeatherPayload {
   hours: WeatherHour[];
   attribution?: string;
   needs_location_confirm?: boolean;
+}
+
+export interface RunSamplePayload {
+  timestamp: string;
+  distance_km: number;
+  metrics: Record<string, number | null>;
 }
 
 export interface PlanSummary {

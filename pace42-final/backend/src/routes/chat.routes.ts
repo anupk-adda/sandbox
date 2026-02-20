@@ -36,6 +36,7 @@ interface ChatResponse {
   agent?: string;
   confidence: number;
   charts?: any[];
+  runSamples?: any[];
   weather?: any;
   planSummary?: PlanSummary;
   weeklyDetail?: WeeklyDetail;
@@ -787,7 +788,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         agent: weather.agent || 'Weather Agent',
         confidence: intent.confidence,
         weather: weather.weather,
-        charts: weather.charts || [],
+        charts: [],
       };
 
       contextManager.recordMessage(conversationId, 'assistant', response.response);
@@ -821,6 +822,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
           agent: cached.agent || 'Cached Analysis',
           confidence: intent.confidence,
           charts: cachedCharts,
+          runSamples: cached?.analysis_payload?.run_samples || cached?.analysis_payload?.runSamples,
         };
 
         contextManager.recordMessage(conversationId, 'assistant', response.response);
@@ -874,15 +876,23 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
           agent: agentUsed,
           confidence: intent.confidence,
           charts: analysis.charts || analysis.chart_data,
+          runSamples: analysis.run_samples || analysis.runSamples,
         };
 
         contextManager.recordMessage(conversationId, 'assistant', response.response);
+        const analysisPayload: Record<string, any> = {};
+        if (response.charts && response.charts.length > 0) {
+          analysisPayload.charts = response.charts;
+        }
+        if (response.runSamples && response.runSamples.length > 0) {
+          analysisPayload.run_samples = response.runSamples;
+        }
         contextManager.recordAnalysis(
           conversationId,
           intent.type,
           agentUsed,
           response.response,
-          response.charts ? { charts: response.charts } : undefined
+          Object.keys(analysisPayload).length ? analysisPayload : undefined
         );
 
         logger.info('Chat response prepared', { 
@@ -929,7 +939,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
             agent: weather.agent || 'Weather Agent',
             confidence: intent.confidence,
             weather: weather.weather,
-            charts: weather.charts || [],
+            charts: [],
           };
 
           contextManager.recordMessage(conversationId, 'assistant', response.response);

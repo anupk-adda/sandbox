@@ -4,6 +4,8 @@
 **Version:** 1.2  
 **Status:** ✅ Stable, Production-Ready
 
+**Latest Update:** Auto .env initialization from Vault in start.sh
+
 ---
 
 ## Overview
@@ -43,6 +45,7 @@ This checkpoint includes the enhanced authentication system with HashiCorp Vault
 | Password Strength | ✅ New | Enforced validation rules |
 | Garmin Persistence | ✅ Fixed | Connection now persists |
 | Garmin Username | ✅ Fixed | Correctly displayed in chat |
+| Auto .env Sync | ✅ New | start.sh auto-updates .env from Vault |
 
 ---
 
@@ -81,6 +84,33 @@ chmod +x vault
 ```
 
 **Note:** `setup-vault.sh` will populate `config/.env` with Vault credentials automatically.
+
+---
+
+## Auto .env Initialization (New)
+
+The `start.sh` script now automatically syncs `.env` from Vault on every startup:
+
+### What It Does
+1. Extracts `root_token` from `vault/vault-init.json`
+2. Updates `config/.env` with:
+   - `VAULT_ADDR=http://127.0.0.1:8200`
+   - `VAULT_TOKEN=<root_token>`
+3. Syncs `OPENAI_API_KEY` from Vault (`pace42/api-keys`) to `.env`
+
+### Behavior
+- Creates new `.env` with full template if it doesn't exist
+- Updates existing `.env` without overwriting other values
+- Removes old/commented Vault entries before adding new ones
+- Runs automatically every time you start the app
+
+```bash
+./scripts/start.sh
+# Output:
+# 📝 Updating .env from Vault...
+#   ✓ .env updated with Vault credentials
+#   ✓ OpenAI key synced from Vault
+```
 
 ---
 

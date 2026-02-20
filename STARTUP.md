@@ -57,6 +57,23 @@ This script will:
 1. Start the Python Agent Service (port 5001)
 2. Build and start the Node.js Backend (port 3000)
 3. Build and start the React Frontend (port 5173)
+4. Initialize/Unseal Vault on cold start (if needed)
+
+### Vault Cold Start (New / Reset Vault Data)
+
+If Vault was reset or `vault-init.json` is missing/empty, run:
+
+```bash
+cd /Users/anupk/devops/sandbox/Kimi_Agent_pac42/pace42-final
+./scripts/init-vault.sh
+```
+
+This script will:
+- Start the Vault server
+- Initialize + unseal Vault
+- Configure KV + Transit engines
+- Generate AppRole credentials
+- Populate `config/.env` with Vault credentials
 
 ### Stop All Services
 
