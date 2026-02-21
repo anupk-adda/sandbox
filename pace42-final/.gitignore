@@ -6,3 +6,29 @@ vault/data/
 vault/*.log
 vault/vault-init.json
 vault/vault-init.json
+
+# OS junk
+.DS_Store
+
+# Logs
+logs/
+
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+agent-service/venv/
+tests/e2e/venv/
+
+# Node/build artifacts
+frontend/node_modules/
+frontend/dist/
+backend/dist/
+frontend/node_modules/.tmp/
+**/*.tsbuildinfo
+
+# Databases
+backend/database/*.db
+backend/database/*.db-shm
+backend/database/*.db-wal
