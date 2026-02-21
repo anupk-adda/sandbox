@@ -12,6 +12,8 @@ import { tokenService } from '../services/auth/token-service.js';
 import { vaultService } from '../services/vault/vault-service.js';
 import { agentClient } from '../services/agent-client/agent-client.js';
 import { garminTokenService } from '../services/garmin/garmin-token-service.js';
+import { ApiError } from '../middleware/error-handler.js';
+import { sendError } from '../utils/error-response.js';
 
 const router = Router();
 const SALT_ROUNDS = 12; // Increased from 10 for better security
@@ -55,20 +57,33 @@ interface GarminValidateRequest {
 export const authenticateToken = async (req: Request, res: Response, next: Function) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
+  const requestId = (req as any).requestId;
 
   if (!token) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
+    return res.status(401).json({
+      error: 'Access denied. No token provided.',
+      code: 'AUTH_NO_TOKEN',
+      requestId,
+    });
   }
 
   try {
     const decoded = await tokenService.verifyAccessToken(token);
     if (!decoded) {
-      return res.status(403).json({ error: 'Invalid or expired token.' });
+      return res.status(403).json({
+        error: 'Invalid or expired token.',
+        code: 'AUTH_INVALID_TOKEN',
+        requestId,
+      });
     }
     (req as any).user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ error: 'Invalid token.' });
+    return res.status(403).json({
+      error: 'Invalid token.',
+      code: 'AUTH_INVALID_TOKEN',
+      requestId,
+    });
   }
 };
 
@@ -80,25 +95,29 @@ router.post('/signup', async (req: Request, res: Response) => {
     const { username, password, rememberMe }: SignupRequest = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+      return sendError(res, req, 400, 'VALIDATION_ERROR', 'Username and password are required');
     }
 
     if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+      return sendError(res, req, 400, 'PASSWORD_WEAK', 'Password must be at least 8 characters');
     }
 
     // Check password strength
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
     if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        error: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
-      });
+      return sendError(
+        res,
+        req,
+        400,
+        'PASSWORD_WEAK',
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+      );
     }
 
     // Check if user already exists
     const existingUser = databaseService.get('SELECT * FROM users WHERE email = ?', [username]);
     if (existingUser) {
-      return res.status(409).json({ error: 'Username already exists' });
+      return sendError(res, req, 409, 'AUTH_USER_EXISTS', 'Username already exists');
     }
 
     // Hash password
@@ -130,7 +149,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Signup error', { error });
-    res.status(500).json({ error: 'Failed to create account' });
+    return sendError(res, req, 500, 'AUTH_SIGNUP_FAILED', 'Failed to create account');
   }
 });
 
@@ -142,23 +161,23 @@ router.post('/login', async (req: Request, res: Response) => {
     const { username, password, rememberMe }: LoginRequest = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+      return sendError(res, req, 400, 'VALIDATION_ERROR', 'Username and password are required');
     }
 
     // Find user
     const user = databaseService.get('SELECT * FROM users WHERE email = ?', [username]);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return sendError(res, req, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid username or password');
     }
 
     // Verify password
     if (!user.password_hash) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return sendError(res, req, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid username or password');
     }
     const passwordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!passwordValid) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return sendError(res, req, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid username or password');
     }
 
     // Generate token pair
@@ -181,7 +200,7 @@ router.post('/login', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Login error', { error });
-    res.status(500).json({ error: 'Failed to login' });
+    return sendError(res, req, 500, 'AUTH_LOGIN_FAILED', 'Failed to login');
   }
 });
 
@@ -193,14 +212,14 @@ router.post('/refresh', async (req: Request, res: Response) => {
     const { refreshToken }: RefreshRequest = req.body;
 
     if (!refreshToken) {
-      return res.status(400).json({ error: 'Refresh token is required' });
+      return sendError(res, req, 400, 'VALIDATION_ERROR', 'Refresh token is required');
     }
 
     // Attempt to refresh the token
     const tokens = await tokenService.refreshAccessToken(refreshToken);
 
     if (!tokens) {
-      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+      return sendError(res, req, 401, 'AUTH_INVALID_TOKEN', 'Invalid or expired refresh token');
     }
 
     logger.info('Token refreshed successfully');
@@ -213,7 +232,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Token refresh error', { error });
-    res.status(500).json({ error: 'Failed to refresh token' });
+    return sendError(res, req, 500, 'AUTH_REFRESH_FAILED', 'Failed to refresh token');
   }
 });
 
@@ -237,7 +256,7 @@ router.post('/logout', authenticateToken, async (req: Request, res: Response) =>
     });
   } catch (error) {
     logger.error('Logout error', { error });
-    res.status(500).json({ error: 'Failed to logout' });
+    return sendError(res, req, 500, 'AUTH_LOGOUT_FAILED', 'Failed to logout');
   }
 });
 
@@ -440,13 +459,13 @@ router.post('/change-password', authenticateToken, async (req: Request, res: Res
 // ============================================
 // Validate Garmin Credentials
 // ============================================
-router.post('/validate-garmin', authenticateToken, async (req: Request, res: Response) => {
+router.post('/validate-garmin', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { garminUsername, garminPassword }: GarminValidateRequest = req.body;
     const userId = (req as any).user.userId;
 
     if (!garminUsername || !garminPassword) {
-      return res.status(400).json({ error: 'Garmin username and password are required' });
+      throw new ApiError('Garmin username and password are required', 400, 'VALIDATION_MISSING_FIELD');
     }
 
     // Test the credentials by exchanging for tokens once
@@ -458,10 +477,11 @@ router.post('/validate-garmin', authenticateToken, async (req: Request, res: Res
 
     if (!testExchange.success) {
       logger.error('Credential test failed', { userId, error: testExchange.error });
-      return res.status(400).json({ 
-        valid: false, 
-        error: testExchange.error || 'Failed to connect to Garmin. Please check your credentials.' 
-      });
+      throw new ApiError(
+        testExchange.error || 'Failed to connect to Garmin. Please check your credentials.',
+        401,
+        'GARMIN_AUTH_FAILED'
+      );
     }
 
     // Store credentials in Vault for future on-demand token exchange
@@ -471,10 +491,7 @@ router.post('/validate-garmin', authenticateToken, async (req: Request, res: Res
     );
 
     if (!stored) {
-      return res.status(500).json({ 
-        valid: false, 
-        error: 'Failed to store credentials securely' 
-      });
+      throw new ApiError('Failed to store credentials securely', 500, 'INTERNAL_ERROR');
     }
 
     // Update user record
@@ -490,8 +507,7 @@ router.post('/validate-garmin', authenticateToken, async (req: Request, res: Res
       message: 'Garmin credentials validated successfully',
     });
   } catch (error) {
-    logger.error('Garmin validation error', { error });
-    res.status(500).json({ error: 'Failed to validate Garmin credentials' });
+    next(error);
   }
 });
 
@@ -577,7 +593,7 @@ router.post('/sessions/:sessionId/revoke', authenticateToken, async (req: Reques
 // ============================================
 // Disconnect Garmin
 // ============================================
-router.post('/disconnect-garmin', authenticateToken, async (req: Request, res: Response) => {
+router.post('/disconnect-garmin', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).user.userId;
 
@@ -601,7 +617,7 @@ router.post('/disconnect-garmin', authenticateToken, async (req: Request, res: R
     // 4. Reset the Garmin MCP client singleton on the agent service
     // This ensures a fresh connection is established when new credentials are provided
     try {
-      const resetResult = await agentClient.resetGarminClient();
+      const resetResult = await agentClient.resetGarminClient(userId);
       if (resetResult.success) {
         logger.info('Garmin MCP client reset successfully', { userId });
       } else {
@@ -618,8 +634,7 @@ router.post('/disconnect-garmin', authenticateToken, async (req: Request, res: R
       message: 'Garmin account disconnected successfully',
     });
   } catch (error) {
-    logger.error('Disconnect Garmin error', { error });
-    res.status(500).json({ error: 'Failed to disconnect Garmin account' });
+    next(error);
   }
 });
 

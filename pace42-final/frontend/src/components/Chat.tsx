@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { chatService } from '../services/chatService';
+import { chatService, SubscriptionError } from '../services/chatService';
 import { authService } from '../services/authService';
 import type { Message, WeatherPayload, PlanSummary, WeeklyDetail, AssistantPrompt, TrainingSummary, RunSamplePayload } from '../services/chatService';
 import { RunningConditionsWidget } from '../features/weather/RunningConditionsWidget';
@@ -12,6 +12,7 @@ import type { HourlyWeather } from '../features/weather/weatherUtils';
 import { RunAnalysisInlineCard } from '../features/run-analysis/RunAnalysisInlineCard';
 import type { RunSample } from '../features/run-analysis/runAnalysisUtils';
 import { Logo } from './auth/Logo';
+import { UpgradePrompt } from './UpgradePrompt';
 import { 
   Send, 
   MapPin, 
@@ -113,6 +114,9 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [, setLocationError] = useState<string | null>(null);
   const [assistantPrompts, setAssistantPrompts] = useState<AssistantPrompt[]>([]);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [upgradePromptType, setUpgradePromptType] = useState<'plan' | 'query'>('query');
+  const [upgradePromptData, setUpgradePromptData] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -230,17 +234,44 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message || 'Failed to process request.'
-          : 'Failed to process request.';
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: `Sorry — ${message} Please try again.`,
-        },
-      ]);
+      if (err instanceof SubscriptionError) {
+        if (err.code === 'QUERY_LIMIT_REACHED') {
+          setUpgradePromptType('query');
+          setUpgradePromptData({
+            tier: err.details?.tier || 'free',
+            limit: err.details?.limit ?? 50,
+            remaining: err.details?.remaining ?? 0,
+          });
+        } else if (err.code === 'PLAN_LIMIT_REACHED') {
+          setUpgradePromptType('plan');
+          setUpgradePromptData({
+            tier: err.details?.tier || 'free',
+            limit: err.details?.limit ?? 1,
+            activePlans: err.details?.activePlans ?? 1,
+          });
+        }
+
+        setShowUpgradePrompt(true);
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: err.message,
+          },
+        ]);
+      } else {
+        const message =
+          err instanceof Error
+            ? err.message || 'Failed to process request.'
+            : 'Failed to process request.';
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: `Sorry — ${message} Please try again.`,
+          },
+        ]);
+      }
       console.error('Chat error:', err);
     } finally {
       clearInterval(progressInterval);
@@ -681,6 +712,25 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Upgrade Prompt */}
+      {showUpgradePrompt && upgradePromptData && (
+        <div className="p-4 border-t border-white/10">
+          <UpgradePrompt
+            type={upgradePromptType}
+            tier={upgradePromptData.tier}
+            limit={upgradePromptData.limit}
+            activePlans={upgradePromptData.activePlans}
+            remaining={upgradePromptData.remaining}
+            onUpgrade={() => {
+              // Navigate to pricing section
+              window.location.hash = '#pricing';
+              setShowUpgradePrompt(false);
+            }}
+            onDismiss={() => setShowUpgradePrompt(false)}
+          />
+        </div>
+      )}
 
       {/* Input */}
       <div className="p-4 border-t border-white/10 bg-[#0A0C0F]/50 backdrop-blur-md">

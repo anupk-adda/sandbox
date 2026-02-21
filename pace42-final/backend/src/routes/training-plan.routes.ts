@@ -1,7 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { trainingPlanService, GoalDistance } from '../services/training-plan-service.js';
+import { subscriptionService } from '../services/subscription-service.js';
 import { logger } from '../utils/logger.js';
 import { authenticateToken } from './auth.routes.js';
+import { requirePlanAllowance } from '../middleware/subscription-check.js';
+import { sendError } from '../utils/error-response.js';
 
 const router = Router();
 
@@ -10,7 +13,7 @@ const getParam = (value: string | string[] | undefined): string => (
 );
 
 // Create a new training plan (authenticated)
-router.post('/', authenticateToken, (req: Request, res: Response) => {
+router.post('/', authenticateToken, requirePlanAllowance, (req: Request, res: Response) => {
   try {
     const { goalDistance, goalDate, daysPerWeek } = req.body as {
       goalDistance: GoalDistance;
@@ -19,7 +22,7 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
     };
 
     if (!goalDistance || !goalDate || !daysPerWeek) {
-      return res.status(400).json({ error: 'goalDistance, goalDate, and daysPerWeek are required.' });
+      return sendError(res, req, 400, 'VALIDATION_ERROR', 'goalDistance, goalDate, and daysPerWeek are required.');
     }
 
     const userId = (req as any).user.userId;
@@ -31,7 +34,7 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
       daysPerWeek,
     });
 
-    // Auto-subscribe user to the plan
+    // Legacy plan subscription flag (kept for backward compatibility)
     trainingPlanService.setSubscription(userId, true);
 
     return res.json({
@@ -41,7 +44,7 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Failed to create training plan', { error });
-    return res.status(500).json({ error: 'Failed to create training plan' });
+    return sendError(res, req, 500, 'TRAINING_PLAN_CREATE_FAILED', 'Failed to create training plan');
   }
 });
 
@@ -51,6 +54,8 @@ router.post('/subscribe', authenticateToken, (req: Request, res: Response) => {
     const { subscribed } = req.body as { subscribed: boolean };
     const userId = (req as any).user.userId;
     
+    // Map legacy subscribe action to subscription tier
+    subscriptionService.setUserTier(userId, subscribed ? 'premium' : 'free', 'legacy-subscribe');
     trainingPlanService.setSubscription(userId, subscribed);
     
     return res.json({
@@ -60,7 +65,7 @@ router.post('/subscribe', authenticateToken, (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Failed to update subscription', { error });
-    return res.status(500).json({ error: 'Failed to update subscription' });
+    return sendError(res, req, 500, 'SUBSCRIPTION_UPDATE_FAILED', 'Failed to update subscription');
   }
 });
 
@@ -70,16 +75,19 @@ router.get('/subscription-status', authenticateToken, (req: Request, res: Respon
     const userId = (req as any).user.userId;
     const isSubscribed = trainingPlanService.isUserSubscribed(userId);
     const activePlanId = trainingPlanService.getActivePlanForUser(userId);
+    const tierStatus = subscriptionService.getTierStatus(userId);
     
     return res.json({
       status: 'success',
       subscribed: isSubscribed,
       hasActivePlan: !!activePlanId,
       planId: activePlanId,
+      tier: tierStatus.tier,
+      limits: tierStatus.limits,
     });
   } catch (error) {
     logger.error('Failed to fetch subscription status', { error });
-    return res.status(500).json({ error: 'Failed to fetch subscription status' });
+    return sendError(res, req, 500, 'SUBSCRIPTION_STATUS_FAILED', 'Failed to fetch subscription status');
   }
 });
 
@@ -99,7 +107,7 @@ router.get('/active', authenticateToken, (req: Request, res: Response) => {
     return res.json({ status: 'success', plan: planSummary, prompts });
   } catch (error) {
     logger.error('Failed to fetch active plan', { error });
-    return res.status(500).json({ error: 'Failed to fetch active plan' });
+    return sendError(res, req, 500, 'TRAINING_PLAN_FETCH_FAILED', 'Failed to fetch active plan');
   }
 });
 
@@ -111,7 +119,7 @@ router.get('/:planId/summary', authenticateToken, (req: Request, res: Response) 
     return res.json({ status: 'success', plan: planSummary });
   } catch (error) {
     logger.error('Failed to fetch plan summary', { error });
-    return res.status(404).json({ error: 'Plan not found' });
+    return sendError(res, req, 404, 'TRAINING_PLAN_NOT_FOUND', 'Plan not found');
   }
 });
 
@@ -124,7 +132,7 @@ router.get('/:planId/weeks/:weekStart', authenticateToken, (req: Request, res: R
     return res.json({ status: 'success', week });
   } catch (error) {
     logger.error('Failed to fetch week details', { error });
-    return res.status(404).json({ error: 'Week not found' });
+    return sendError(res, req, 404, 'TRAINING_PLAN_WEEK_NOT_FOUND', 'Week not found');
   }
 });
 
@@ -136,7 +144,7 @@ router.get('/workouts/:workoutId', authenticateToken, (req: Request, res: Respon
     return res.json({ status: 'success', workout });
   } catch (error) {
     logger.error('Failed to fetch workout detail', { error });
-    return res.status(404).json({ error: 'Workout not found' });
+    return sendError(res, req, 404, 'TRAINING_PLAN_WORKOUT_NOT_FOUND', 'Workout not found');
   }
 });
 
@@ -148,7 +156,7 @@ router.get('/users/me/prompts', authenticateToken, (req: Request, res: Response)
     return res.json({ status: 'success', prompts });
   } catch (error) {
     logger.error('Failed to fetch prompts', { error });
-    return res.status(500).json({ error: 'Failed to fetch prompts' });
+    return sendError(res, req, 500, 'TRAINING_PLAN_PROMPTS_FAILED', 'Failed to fetch prompts');
   }
 });
 
@@ -160,7 +168,7 @@ router.get('/users/:userId/prompts', authenticateToken, (req: Request, res: Resp
     return res.json({ status: 'success', prompts });
   } catch (error) {
     logger.error('Failed to fetch prompts', { error });
-    return res.status(500).json({ error: 'Failed to fetch prompts' });
+    return sendError(res, req, 500, 'TRAINING_PLAN_PROMPTS_FAILED', 'Failed to fetch prompts');
   }
 });
 
@@ -177,7 +185,7 @@ router.get('/users/:userId/active', authenticateToken, (req: Request, res: Respo
     return res.json({ status: 'success', plan: planSummary, prompts });
   } catch (error) {
     logger.error('Failed to fetch active plan', { error });
-    return res.status(500).json({ error: 'Failed to fetch active plan' });
+    return sendError(res, req, 500, 'TRAINING_PLAN_FETCH_FAILED', 'Failed to fetch active plan');
   }
 });
 

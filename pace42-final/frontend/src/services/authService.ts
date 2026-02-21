@@ -581,7 +581,7 @@ class AuthService {
 
     try {
       // Call backend to clear credentials from database and Vault
-      const response = await fetch(`${BACKEND_API_URL}/auth/disconnect-garmin`, {
+      const response = await fetch(`${BACKEND_API_URL}/api/v1/auth/disconnect-garmin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

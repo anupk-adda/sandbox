@@ -38,6 +38,19 @@ export interface ChatResponse {
   error?: string;
 }
 
+export class SubscriptionError extends Error {
+  code: string;
+  status: number;
+  details?: Record<string, any>;
+
+  constructor(message: string, code: string, status: number, details?: Record<string, any>) {
+    super(message);
+    this.code = code;
+    this.status = status;
+    this.details = details;
+  }
+}
+
 export interface ChartSeries {
   label: string;
   data: number[];
@@ -183,13 +196,33 @@ class ChatService {
     });
 
     if (!response.ok) {
-      // Handle 401/403 by logging out
-      if (response.status === 401 || response.status === 403) {
+      let errorBody: any = {};
+      try {
+        errorBody = await response.json();
+      } catch {
+        errorBody = {};
+      }
+
+      if (response.status === 401) {
         authService.logout();
         throw new Error('Session expired. Please login again.');
       }
-      const error = await response.json();
-      throw new Error(error.error || error.detail || 'Failed to send message');
+
+      if ((response.status === 403 || response.status === 429) && errorBody?.code) {
+        throw new SubscriptionError(
+          errorBody.error || errorBody.detail || 'Upgrade required.',
+          errorBody.code,
+          response.status,
+          errorBody
+        );
+      }
+
+      if (response.status === 403) {
+        authService.logout();
+        throw new Error('Session expired. Please login again.');
+      }
+
+      throw new Error(errorBody.error || errorBody.detail || 'Failed to send message');
     }
 
     const data = await response.json();

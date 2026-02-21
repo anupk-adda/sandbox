@@ -50,35 +50,38 @@ def get_openai_key():
         return os.getenv('OPENAI_API_KEY', '')
 
 
-def get_garmin_tokens(user_id: str) -> Optional[str]:
+def get_garmin_credentials(user_id: str) -> Optional[dict]:
     """
-    Get Garmin OAuth tokens for a user from Vault.
+    Get Garmin credentials for a user from Vault.
     
     Args:
         user_id: The user ID
         
     Returns:
-        Base64 encoded tokens string, or None if not found
+        Dict with username/password, or None if not found
     """
     try:
         client = get_vault_client()
         if not client:
-            print(f"Warning: Vault not available, cannot get Garmin tokens for user {user_id}")
+            print(f"Warning: Vault not available, cannot get Garmin credentials for user {user_id}")
             return None
         
         secret = client.secrets.kv.v2.read_secret_version(
-            path=f"garmin-tokens/{user_id}",
+            path=f"garmin-credentials/{user_id}",
             mount_point="pace42"
         )
         
-        tokens_b64 = secret['data']['data'].get('tokens_b64')
-        if tokens_b64:
-            print(f"Retrieved Garmin tokens from Vault for user {user_id}")
-            return tokens_b64
-        else:
-            print(f"No Garmin tokens found in Vault for user {user_id}")
-            return None
+        data = secret['data']['data']
+        username = data.get('username')
+        password = data.get('password')
+        
+        if username and password:
+            print(f"Retrieved Garmin credentials from Vault for user {user_id}")
+            return {"username": username, "password": password}
+        
+        print(f"No Garmin credentials found in Vault for user {user_id}")
+        return None
             
     except Exception as e:
-        print(f"Warning: Could not fetch Garmin tokens from Vault for user {user_id}: {e}")
+        print(f"Warning: Could not fetch Garmin credentials from Vault for user {user_id}: {e}")
         return None

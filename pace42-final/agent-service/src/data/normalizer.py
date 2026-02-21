@@ -67,7 +67,7 @@ class GarminDataNormalizer:
         
         normalized = {
             "activity_id": raw_data.get("activityId"),
-            "name": raw_data.get("activityName", "Unnamed Run"),
+            "name": raw_data.get("activityName") or "Unnamed Run",
             "date": raw_data.get("startTimeGMT"),
             "type": activity_type,
             "description": raw_data.get("description", "")
@@ -86,8 +86,14 @@ class GarminDataNormalizer:
             self.logger.warning(f"Activity {normalized['activity_id']}: summaryDTO is empty")
         
         # Extract metrics from summaryDTO (CORRECT location)
-        distance = summary.get("distance", 0)
-        duration = summary.get("duration", 0)
+        def _to_float(value: Any) -> float:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return 0.0
+
+        distance = _to_float(summary.get("distance"))
+        duration = _to_float(summary.get("duration"))
         
         self.logger.info(f"Activity {normalized['activity_id']}: Extracted distance={distance}m, duration={duration}s from summaryDTO")
         
@@ -163,9 +169,17 @@ class GarminDataNormalizer:
                 normalized["duration_min"] = sum(s.get("duration", 0) for s in valid_splits) / 60
                 normalized["laps"] = self._normalize_laps(valid_splits)
             else:
-                self.logger.warning(f"Activity {normalized['activity_id']}: No splits data available")
-                normalized["distance_km"] = 0
-                normalized["duration_min"] = 0
+                if distance > 0 or duration > 0:
+                    self.logger.warning(
+                        f"Activity {normalized['activity_id']}: No splits data available; "
+                        f"using partial summary metrics (distance={distance}, duration={duration})"
+                    )
+                    normalized["distance_km"] = distance / 1000 if distance > 0 else 0
+                    normalized["duration_min"] = duration / 60 if duration > 0 else 0
+                else:
+                    self.logger.warning(f"Activity {normalized['activity_id']}: No splits data available")
+                    normalized["distance_km"] = 0
+                    normalized["duration_min"] = 0
                 normalized["laps"] = []
         else:
             # Use summary
@@ -195,6 +209,13 @@ class GarminDataNormalizer:
         normalized["anaerobic_training_effect"] = summary.get("anaerobicTrainingEffect", 0)
         normalized["avg_speed_ms"] = summary.get("averageSpeed", 0)  # meters/second
         normalized["max_speed_ms"] = summary.get("maxSpeed", 0)
+        
+        # Add data quality metadata
+        normalized["data_quality"] = {
+            "has_summary": bool(summary and isinstance(summary, dict) and summary.get("distance")),
+            "has_splits": bool(splits),
+            "metrics_source": "summary" if distance > 0 else "splits"
+        }
         
         # Log extracted metrics for verification
         self.logger.info(f"Activity {normalized['activity_id']}: Extracted metrics - "
@@ -230,8 +251,13 @@ class GarminDataNormalizer:
                 self.logger.warning(f"Skipping lap {i}: not a dict (type: {type(lap)})")
                 continue
             
-            distance_m = lap.get("distance", 0)
-            duration_s = lap.get("duration", 0)
+            # Type validation and conversion for lap metrics
+            try:
+                distance_m = float(lap.get("distance", 0))
+                duration_s = float(lap.get("duration", 0))
+            except (TypeError, ValueError) as e:
+                self.logger.warning(f"Skipping lap {i}: invalid metrics (distance={lap.get('distance')}, duration={lap.get('duration')}): {e}")
+                continue
             
             normalized_lap = {
                 "lap_number": i,
@@ -270,6 +296,22 @@ class GarminDataNormalizer:
         Returns:
             Normalized HR zones dictionary
         """
+        # Some MCP responses return JSON strings or dict-wrapped lists
+        if isinstance(raw_zones, str):
+            try:
+                raw_zones = json.loads(raw_zones)
+            except json.JSONDecodeError:
+                self.logger.warning("normalize_hr_zones: raw_zones string is not valid JSON")
+                raw_zones = []
+
+        if isinstance(raw_zones, dict):
+            if "zones" in raw_zones:
+                raw_zones = raw_zones.get("zones", [])
+            elif "hrZones" in raw_zones:
+                raw_zones = raw_zones.get("hrZones", [])
+            else:
+                raw_zones = []
+
         if not raw_zones:
             return {"zones": [], "total_time_s": 0, "has_complete_data": False}
         
@@ -277,6 +319,15 @@ class GarminDataNormalizer:
         total_time = 0
         
         for zone_data in raw_zones:
+            if isinstance(zone_data, str):
+                try:
+                    zone_data = json.loads(zone_data)
+                except json.JSONDecodeError:
+                    self.logger.warning("normalize_hr_zones: zone_data string is not valid JSON")
+                    continue
+            if not isinstance(zone_data, dict):
+                self.logger.warning(f"normalize_hr_zones: zone_data not a dict (type: {type(zone_data)})")
+                continue
             zone_num = zone_data.get("zoneNumber", 0)
             time_in_zone = zone_data.get("secsInZone", 0)
             low_boundary = zone_data.get("zoneLowBoundary", 0)

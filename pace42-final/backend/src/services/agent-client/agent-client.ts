@@ -359,15 +359,20 @@ export class AgentClient {
    * Reset the Garmin MCP client singleton
    * Call this when a user disconnects their Garmin account
    */
-  async resetGarminClient(): Promise<{ success: boolean; message?: string }> {
-    logger.info('Calling agent service: reset Garmin client');
+  async resetGarminClient(userId?: string): Promise<{ success: boolean; message?: string }> {
+    logger.info('Calling agent service: reset Garmin client', { userId });
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+
       const response = await fetch(`${this.baseUrl}/reset-garmin-client`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         signal: AbortSignal.timeout(10000),
       });
 

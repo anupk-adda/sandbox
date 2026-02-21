@@ -69,17 +69,22 @@ def build_single_run_detail_charts(activity_data: dict, metrics: List[str]) -> L
         pace_deviations = []
         colors = []
         for lap in lap_data:
-            if lap["pace"] > 0:
-                dev = ((lap["pace"] - avg_pace) / avg_pace) * 100
-                pace_deviations.append(round(dev, 1))
-                # Color based on deviation
-                if abs(dev) <= 5:
-                    colors.append("#10b981")  # Green = consistent
-                elif abs(dev) <= 10:
-                    colors.append("#f59e0b")  # Orange = moderate variance
+            try:
+                if lap["pace"] > 0 and avg_pace > 0:
+                    dev = ((lap["pace"] - avg_pace) / avg_pace) * 100
+                    pace_deviations.append(round(dev, 1))
+                    # Color based on deviation
+                    if abs(dev) <= 5:
+                        colors.append("#10b981")  # Green = consistent
+                    elif abs(dev) <= 10:
+                        colors.append("#f59e0b")  # Orange = moderate variance
+                    else:
+                        colors.append("#ef4444")  # Red = high variance
                 else:
-                    colors.append("#ef4444")  # Red = high variance
-            else:
+                    pace_deviations.append(0)
+                    colors.append("#6b7280")
+            except Exception as e:
+                logger.warning(f"Failed to calculate pace deviation: {e}")
                 pace_deviations.append(0)
                 colors.append("#6b7280")
         
@@ -220,14 +225,33 @@ def build_run_metric_charts(activities: List[Dict[str, Any]], max_runs: int) -> 
     if not activities:
         logger.warning("build_run_metric_charts: No activities provided")
         return []
+
+    # Filter out invalid or unnormalized entries
+    def _is_valid_activity(activity: Any) -> bool:
+        if not isinstance(activity, dict):
+            return False
+        normalized = activity.get("normalized")
+        if not isinstance(normalized, dict):
+            return False
+        activity_data = normalized.get("activity")
+        return isinstance(activity_data, dict)
+
+    valid_activities = [a for a in activities if _is_valid_activity(a)]
+    if not valid_activities:
+        logger.warning("build_run_metric_charts: No valid normalized activities found")
+        return []
     
     # Sort activities by date (newest first)
     def _safe_date(activity: Dict[str, Any]) -> str:
-        raw_date = (
-            activity.get("normalized", {})
-            .get("activity", {})
-            .get("date")
-        )
+        if not isinstance(activity, dict):
+            return ""
+        normalized = activity.get("normalized")
+        if not isinstance(normalized, dict):
+            return ""
+        activity_data = normalized.get("activity")
+        if not isinstance(activity_data, dict):
+            return ""
+        raw_date = activity_data.get("date")
         if raw_date is None:
             return ""
         if isinstance(raw_date, str):
@@ -235,7 +259,7 @@ def build_run_metric_charts(activities: List[Dict[str, Any]], max_runs: int) -> 
         return str(raw_date)
 
     sorted_activities = sorted(
-        activities,
+        valid_activities,
         key=_safe_date,
         reverse=True
     )
@@ -256,10 +280,17 @@ def build_run_metric_charts(activities: List[Dict[str, Any]], max_runs: int) -> 
         if label == "Unknown":
             label = f"Run {idx}"
         labels.append(label)
-        pace_values.append(activity_data.get("avg_pace_min_per_km") or 0)
-        hr_values.append(activity_data.get("avg_hr") or 0)
-        cadence_values.append(activity_data.get("avg_cadence") or 0)
-        distance_values.append(activity_data.get("distance_km") or 0)
+        
+        # Extract metrics with explicit None checks
+        pace = activity_data.get("avg_pace_min_per_km")
+        hr = activity_data.get("avg_hr")
+        cadence = activity_data.get("avg_cadence")
+        distance = activity_data.get("distance_km")
+        
+        pace_values.append(pace if pace is not None else 0)
+        hr_values.append(hr if hr is not None else 0)
+        cadence_values.append(cadence if cadence is not None else 0)
+        distance_values.append(distance if distance is not None else 0)
 
     charts = []
     

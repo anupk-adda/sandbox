@@ -263,40 +263,52 @@ mkdir -p "$PROJECT_ROOT/backend/database"
 
 # Run migrations using Node.js script
 cd "$PROJECT_ROOT/backend"
-if [ -f "../database/migrations/002_auth_improvements.sql" ]; then
+if [ -d "../database/migrations" ]; then
     node -e "
         const Database = require('better-sqlite3');
         const path = require('path');
+        const fs = require('fs');
         
         const dbPath = path.join(__dirname, 'database', 'running_coach.db');
         const db = new Database(dbPath);
+        const migrationFiles = [
+          '../database/migrations/002_auth_improvements.sql',
+          '../database/migrations/003_subscription_gating.sql',
+        ].filter(fs.existsSync);
+        
+        if (!migrationFiles.length) {
+          console.log('✓ No migrations found');
+          db.close();
+          return;
+        }
+
+        const ignoreErrors = (message) => (
+          message.includes('already exists') ||
+          message.toLowerCase().includes('duplicate column name')
+        );
         
         try {
-            // Read and execute migration
-            const fs = require('fs');
-            const migration = fs.readFileSync('../database/migrations/002_auth_improvements.sql', 'utf8');
-            
-            // Split by semicolons and execute each statement
+          for (const file of migrationFiles) {
+            const migration = fs.readFileSync(file, 'utf8');
             const statements = migration.split(';').filter(s => s.trim());
-            
             db.exec('BEGIN TRANSACTION;');
             for (const stmt of statements) {
-                try {
-                    db.exec(stmt + ';');
-                } catch (e) {
-                    // Ignore errors for IF NOT EXISTS statements
-                    if (!e.message.includes('already exists')) {
-                        throw e;
-                    }
+              try {
+                db.exec(stmt + ';');
+              } catch (e) {
+                if (!ignoreErrors(e.message || '')) {
+                  throw e;
                 }
+              }
             }
             db.exec('COMMIT;');
-            console.log('✓ Database migrations applied');
+          }
+          console.log('✓ Database migrations applied');
         } catch (error) {
-            db.exec('ROLLBACK;');
-            console.error('Migration error:', error.message);
+          db.exec('ROLLBACK;');
+          console.error('Migration error:', error.message);
         } finally {
-            db.close();
+          db.close();
         }
     " 2>/dev/null || echo "  ⚠ Migrations may have already been applied"
 fi

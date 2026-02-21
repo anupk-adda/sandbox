@@ -54,8 +54,17 @@ class CurrentRunAnalyzer(FlexibleRunningAgent):
                     "agent": self.agent_name
                 }
             
-            # Get activity data
-            activity = gathered_data["activities"][0]
+            # Get first valid activity (normalization may fail for some entries)
+            activities = gathered_data["activities"]
+            activity = next(
+                (
+                    act for act in activities
+                    if isinstance(act, dict)
+                    and isinstance(act.get("normalized"), dict)
+                    and isinstance(act.get("normalized", {}).get("activity"), dict)
+                ),
+                activities[0]
+            )
             normalized = activity.get("normalized")
             
             # Handle case where normalization failed

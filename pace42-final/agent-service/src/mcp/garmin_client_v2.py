@@ -1,5 +1,5 @@
 """
-Garmin MCP Client V2 - Multi-User with Vault-Backed Tokens
+Garmin MCP Client V2 - Multi-User with Vault-Backed Credentials
 Handles user-scoped communication with the Garmin MCP server
 """
 
@@ -7,12 +7,14 @@ import os
 import json
 import asyncio
 import logging
+import tempfile
+from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
 from contextlib import asynccontextmanager
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from ..config import get_garmin_config
-from ..vault_client import get_garmin_tokens
+from ..vault_client import get_garmin_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -40,26 +42,34 @@ class UserScopedGarminClient:
     
     def _setup_environment(self) -> Dict[str, str]:
         """
-        Set up environment with tokens from Vault for this user.
+        Set up environment with credentials from Vault for this user.
         
-        The MCP server checks GARMINTOKENS env var. If the value is > 512 chars,
-        garminconnect library treats it as base64 encoded tokens.
+        The MCP server reads GARMIN_EMAIL and GARMIN_PASSWORD to authenticate.
         
         Returns:
-            Environment dictionary with tokens injected
+            Environment dictionary with credentials injected
         """
         env = os.environ.copy()
         
-        # Get tokens from Vault for this user
-        tokens_b64 = get_garmin_tokens(self.user_id)
+        # Get credentials from Vault for this user
+        creds = get_garmin_credentials(self.user_id)
         
-        if tokens_b64:
-            # Set GARMINTOKENS to base64 tokens
-            # garminconnect library treats strings > 512 chars as base64
-            env['GARMINTOKENS'] = tokens_b64
-            logger.info(f"Injected Vault tokens for user {self.user_id} via GARMINTOKENS")
+        if creds:
+            env['GARMIN_EMAIL'] = creds["username"]
+            env['GARMIN_PASSWORD'] = creds["password"]
+            logger.info(f"Injected Vault credentials for user {self.user_id}")
         else:
-            logger.warning(f"No tokens available for user {self.user_id}")
+            logger.warning(f"No credentials available for user {self.user_id}")
+
+        # Ensure token store is isolated per user
+        token_dir, base64_path = _get_user_token_paths(self.user_id)
+        try:
+            token_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            logger.warning(f"Failed to create Garmin token directory {token_dir}: {e}")
+
+        env['GARMINTOKENS'] = str(token_dir)
+        env['GARMINTOKENS_BASE64'] = str(base64_path)
         
         return env
     
@@ -260,9 +270,53 @@ class UserScopedGarminClient:
             logger.error(f"Error fetching HR zones: {e}")
             return []
 
+    async def get_activity_weather(self, activity_id: str) -> Dict[str, Any]:
+        """Get weather data for an activity"""
+        try:
+            async with self._get_session() as session:
+                result = await session.call_tool(
+                    "get_activity_weather",
+                    arguments={"activity_id": activity_id}
+                )
+
+                if result.content and len(result.content) > 0:
+                    import json
+                    from mcp.types import TextContent
+
+                    first_content = result.content[0]
+                    content_text = first_content.text if isinstance(first_content, TextContent) else str(first_content)
+
+                    try:
+                        data = json.loads(content_text)
+                        return data if isinstance(data, dict) else {}
+                    except json.JSONDecodeError:
+                        logger.warning(f"Failed to parse weather data for activity {activity_id}")
+                        return {}
+
+                return {}
+
+        except Exception as e:
+            logger.error(f"Error fetching weather data: {e}")
+            return {}
+
 
 # Client cache per user
 _user_clients: Dict[str, UserScopedGarminClient] = {}
+
+def _sanitize_user_id(user_id: str) -> str:
+    """Ensure user_id is safe for filesystem paths."""
+    if not user_id:
+        return "unknown"
+    return "".join(ch for ch in user_id if ch.isalnum() or ch in ("-", "_")) or "unknown"
+
+
+def _get_user_token_paths(user_id: str) -> tuple[Path, Path]:
+    """Return (token_dir, base64_path) for a given user."""
+    safe_user_id = _sanitize_user_id(user_id)
+    base_dir = Path(tempfile.gettempdir()) / "pace42-garmin" / safe_user_id
+    token_dir = base_dir / "tokens"
+    base64_path = base_dir / ".garminconnect_base64"
+    return token_dir, base64_path
 
 
 def get_client_for_user(user_id: str) -> UserScopedGarminClient:
@@ -277,3 +331,24 @@ def clear_client_for_user(user_id: str):
     if user_id in _user_clients:
         del _user_clients[user_id]
         logger.info(f"Cleared Garmin client for user {user_id}")
+
+
+def clear_token_store_for_user(user_id: str):
+    """Clear token files for a user (on disconnect or credential change)."""
+    token_dir, base64_path = _get_user_token_paths(user_id)
+    try:
+        if base64_path.exists():
+            base64_path.unlink()
+            logger.info(f"Cleared Garmin base64 token for user {user_id}")
+        if token_dir.exists():
+            for file in token_dir.glob("*"):
+                try:
+                    file.unlink()
+                except Exception:
+                    pass
+            try:
+                token_dir.rmdir()
+            except Exception:
+                pass
+    except Exception as e:
+        logger.warning(f"Failed to clear Garmin token store for user {user_id}: {e}")

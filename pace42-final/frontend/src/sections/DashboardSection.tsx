@@ -10,6 +10,8 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
   const [plan, setPlan] = useState<PlanSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [tier, setTier] = useState<string>('free');
+  const [queryUsage, setQueryUsage] = useState<{ remaining: number; limit: number } | null>(null);
 
   useEffect(() => {
     loadDashboardData();
@@ -22,6 +24,25 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
       // Check subscription status
       const subStatus = await chatService.getSubscriptionStatus();
       setIsSubscribed(subStatus.subscribed);
+      
+      // Fetch tier and usage info
+      try {
+        const response = await fetch('/api/v1/subscription/status', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTier(data.tier || 'free');
+          if (data.usage) {
+            setQueryUsage({
+              remaining: data.usage.remainingQueries,
+              limit: data.usage.limits.maxQueriesPerMonth,
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch subscription tier:', err);
+      }
       
       // Load active plan
       const planData = await chatService.fetchActivePlan();
@@ -94,6 +115,20 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
           </div>
           
           <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                tier === 'premium'
+                  ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400'
+                  : 'bg-white/10 text-white/60'
+              }`}>
+                {tier === 'premium' ? '⭐ Premium' : 'Free Tier'}
+              </span>
+              {queryUsage && tier === 'free' && (
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
+                  {queryUsage.remaining}/{queryUsage.limit} queries left
+                </span>
+              )}
+            </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
               isSubscribed 
                 ? 'bg-[#00D4AA]/20 text-[#00D4AA]' 

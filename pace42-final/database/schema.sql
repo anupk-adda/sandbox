@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     garmin_user_id TEXT UNIQUE,
+    subscription_tier TEXT NOT NULL DEFAULT 'free',
+    subscription_updated_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     preferences TEXT DEFAULT '{}'
@@ -124,6 +126,35 @@ CREATE INDEX IF NOT EXISTS idx_training_plans_goal_date
     ON training_plans(goal_date);
 
 -- ============================================
+-- Subscription Tables
+-- ============================================
+CREATE TABLE IF NOT EXISTS subscription_history (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    tier TEXT NOT NULL,
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP,
+    payment_status TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscription_history_user 
+    ON subscription_history(user_id, start_date DESC);
+
+CREATE TABLE IF NOT EXISTS subscription_usage (
+    user_id TEXT NOT NULL,
+    month_key TEXT NOT NULL,
+    query_count INTEGER NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, month_key),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscription_usage_user 
+    ON subscription_usage(user_id, month_key DESC);
+
+-- ============================================
 -- Agent Execution Logs Table (Observability)
 -- ============================================
 CREATE TABLE IF NOT EXISTS agent_execution_logs (
@@ -226,6 +257,9 @@ CREATE TABLE IF NOT EXISTS schema_version (
 
 INSERT OR IGNORE INTO schema_version (version, description) 
 VALUES ('1.0.0', 'Initial schema with users, activities, fitness metrics, analysis reports, training plans, and agent logs');
+
+INSERT OR IGNORE INTO schema_version (version, description)
+VALUES ('1.2.0', 'Added subscription tiering and usage tracking tables');
 
 -- ============================================
 -- Views for Common Queries

@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import { randomUUID } from 'crypto';
 import { config } from './config/config-loader.js';
 import { databaseService } from './services/database/database-service.js';
 import { vaultService } from './services/vault/vault-service.js';
@@ -12,6 +13,7 @@ import { errorHandler } from './middleware/error-handler.js';
 // Import routes
 import chatRoutes from './routes/chat.routes.js';
 import trainingPlanRoutes from './routes/training-plan.routes.js';
+import subscriptionRoutes from './routes/subscription.routes.js';
 import authRoutes, { authenticateToken } from './routes/auth.routes.js';
 
 class Server {
@@ -34,11 +36,38 @@ class Server {
       credentials: config.api.cors.credentials,
     }));
 
+    // Request correlation ID + timing
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
+      const requestId = randomUUID();
+      (req as any).requestId = requestId;
+      res.setHeader('X-Request-Id', requestId);
+      const start = Date.now();
+
+      res.on('finish', () => {
+        logger.info('Request completed', {
+          requestId,
+          method: req.method,
+          path: req.path,
+          statusCode: res.statusCode,
+          durationMs: Date.now() - start,
+          userId: (req as any).user?.userId,
+        });
+      });
+
+      next();
+    });
+
     // Rate limiting
     const limiter = rateLimit({
       windowMs: config.api.rateLimit.windowMs,
       max: config.api.rateLimit.maxRequests,
-      message: 'Too many requests from this IP, please try again later.',
+      handler: (req: Request, res: Response) => {
+        res.status(429).json({
+          error: 'Too many requests from this IP, please try again later.',
+          code: 'RATE_LIMITED',
+          requestId: (req as any).requestId,
+        });
+      },
     });
     this.app.use(limiter);
 
@@ -52,6 +81,7 @@ class Server {
         method: req.method,
         path: req.path,
         ip: req.ip,
+        requestId: (req as any).requestId,
       });
       next();
     });
@@ -94,6 +124,7 @@ class Server {
     this.app.use(`${baseUrl}/chat`, authenticateToken, chatRoutes);
     logger.info('Chat routes registered successfully');
     this.app.use(`${baseUrl}/auth`, authRoutes);
+    this.app.use(`${baseUrl}/subscription`, subscriptionRoutes);
     // this.app.use(`${baseUrl}/activities`, activityRoutes);
     // this.app.use(`${baseUrl}/analysis`, analysisRoutes);
     this.app.use(`${baseUrl}/training-plans`, trainingPlanRoutes);

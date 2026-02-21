@@ -4,6 +4,9 @@
  */
 
 import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 import { logger } from '../../utils/logger.js';
 import { vaultService } from '../vault/vault-service.js';
 
@@ -103,18 +106,12 @@ export class GarminTokenService {
 
       logger.info(`Exchanging credentials for tokens for user ${userId}`);
 
-      // 2. Clear any existing tokens to force fresh login
-      await this.clearTokenStore();
-
-      // 3. Spawn MCP server with credentials to perform login
+      // 2. Spawn MCP server with credentials to perform login
       const tokens = await this.performLoginAndExtractTokens(creds);
       
       if (!tokens) {
         return { success: false, error: 'Failed to obtain tokens from Garmin' };
       }
-
-      // 4. Clear local token store for security
-      await this.clearTokenStore();
 
       logger.info(`Token exchange successful for user ${userId}`);
       return { success: true, tokens };
@@ -146,10 +143,28 @@ export class GarminTokenService {
     credentials: GarminCredentials
   ): Promise<string | null> {
     return new Promise((resolve, reject) => {
+      const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'garminconnect-'));
+      // Explicit token store paths to avoid relying on user HOME defaults.
+      const tokenDir = path.join(tmpRoot, 'tokens');
+      const base64Path = path.join(tmpRoot, '.garminconnect_base64');
+
+      try {
+        fs.mkdirSync(tokenDir, { recursive: true });
+        // Some Garmin libraries expect a nested "tokens" directory.
+        fs.mkdirSync(path.join(tokenDir, 'tokens'), { recursive: true });
+      } catch (error) {
+        logger.warn('Failed to pre-create Garmin token directory', { error, tokenDir });
+      }
+
       const env = {
         ...process.env,
         GARMIN_EMAIL: credentials.email,
         GARMIN_PASSWORD: credentials.password,
+        // Force per-request token isolation by scoping HOME to temp directory
+        HOME: tmpRoot,
+        // Explicit token locations for garmin_mcp_server.py
+        GARMINTOKENS: tokenDir,
+        GARMINTOKENS_BASE64: base64Path,
       };
 
       logger.info('Spawning MCP server for token extraction...');
@@ -161,6 +176,7 @@ export class GarminTokenService {
 
       let stdout = '';
       let stderr = '';
+      let finished = false;
 
       child.stdout?.on('data', (data) => {
         stdout += data.toString();
@@ -170,16 +186,71 @@ export class GarminTokenService {
         stderr += data.toString();
       });
 
-      // Give it time to login (up to 15 seconds)
-      setTimeout(async () => {
-        child.kill();
-        const tokens = await this.readTokensFromStore();
+      const cleanup = () => {
+        try {
+          if (fs.existsSync(tmpRoot)) {
+            fs.rmSync(tmpRoot, { recursive: true, force: true });
+          }
+        } catch (error) {
+          logger.warn('Failed to cleanup Garmin token temp dir', { error });
+        }
+      };
+
+      const finish = async () => {
+        if (finished) return;
+        finished = true;
+
+        const tokens = await this.readTokensFromStore(base64Path, tokenDir);
+
+        if (!tokens) {
+          const stderrSnippet = stderr.trim().slice(-2000);
+          const stdoutSnippet = stdout.trim().slice(-2000);
+          if (stderrSnippet) {
+            logger.error('Garmin MCP stderr', { stderr: stderrSnippet });
+          }
+          if (stdoutSnippet) {
+            logger.warn('Garmin MCP stdout', { stdout: stdoutSnippet });
+          }
+        }
+
+        cleanup();
         resolve(tokens);
-      }, 15000);
+      };
+
+      const pollInterval = setInterval(async () => {
+        if (finished) return;
+        const oauth1Path = path.join(tokenDir, 'oauth1_token.json');
+        const oauth1AltPath = path.join(tokenDir, 'tokens', 'oauth1_token.json');
+        if (fs.existsSync(base64Path) || fs.existsSync(oauth1Path) || fs.existsSync(oauth1AltPath)) {
+          clearInterval(pollInterval);
+          try {
+            child.kill();
+          } catch {}
+          await finish();
+        }
+      }, 500);
+
+      // Give it time to login (up to 30 seconds)
+      const timeout = setTimeout(async () => {
+        clearInterval(pollInterval);
+        try {
+          child.kill();
+        } catch {}
+        await finish();
+      }, 30000);
 
       child.on('error', (error) => {
         logger.error('MCP server spawn error:', { error });
+        clearInterval(pollInterval);
+        clearTimeout(timeout);
+        cleanup();
         reject(error);
+      });
+
+      child.on('exit', async () => {
+        clearInterval(pollInterval);
+        clearTimeout(timeout);
+        await finish();
       });
     });
   }
@@ -187,14 +258,13 @@ export class GarminTokenService {
   /**
    * Read tokens from filesystem store
    */
-  private async readTokensFromStore(): Promise<string | null> {
+  private async readTokensFromStore(
+    base64PathOverride?: string,
+    tokenDirOverride?: string
+  ): Promise<string | null> {
     try {
-      const fs = await import('fs');
-      const path = await import('path');
-      const os = await import('os');
-
       // Try base64 file first
-      const base64Path = path.resolve(os.homedir(), '.garminconnect_base64');
+      const base64Path = base64PathOverride || path.resolve(os.homedir(), '.garminconnect_base64');
       if (fs.existsSync(base64Path)) {
         const tokens = fs.readFileSync(base64Path, 'utf-8').trim();
         logger.info(`Read tokens from ${base64Path}`);
@@ -202,22 +272,26 @@ export class GarminTokenService {
       }
 
       // Try directory with oauth files
-      const tokenDir = path.resolve(os.homedir(), '.garminconnect');
-      const oauth1Path = path.join(tokenDir, 'oauth1_token.json');
-      const oauth2Path = path.join(tokenDir, 'oauth2_token.json');
+      const tokenDir = tokenDirOverride || path.resolve(os.homedir(), '.garminconnect');
+      const tokenDirCandidates = [tokenDir, path.join(tokenDir, 'tokens')];
 
-      if (fs.existsSync(oauth1Path) && fs.existsSync(oauth2Path)) {
-        const oauth1 = JSON.parse(fs.readFileSync(oauth1Path, 'utf-8'));
-        const oauth2 = JSON.parse(fs.readFileSync(oauth2Path, 'utf-8'));
+      for (const dir of tokenDirCandidates) {
+        const oauth1Path = path.join(dir, 'oauth1_token.json');
+        const oauth2Path = path.join(dir, 'oauth2_token.json');
 
-        const tokenData = {
-          oauth1_token: oauth1,
-          oauth2_token: oauth2,
-        };
+        if (fs.existsSync(oauth1Path) && fs.existsSync(oauth2Path)) {
+          const oauth1 = JSON.parse(fs.readFileSync(oauth1Path, 'utf-8'));
+          const oauth2 = JSON.parse(fs.readFileSync(oauth2Path, 'utf-8'));
 
-        const tokens = Buffer.from(JSON.stringify(tokenData)).toString('base64');
-        logger.info(`Created base64 tokens from directory`);
-        return tokens;
+          const tokenData = {
+            oauth1_token: oauth1,
+            oauth2_token: oauth2,
+          };
+
+          const tokens = Buffer.from(JSON.stringify(tokenData)).toString('base64');
+          logger.info(`Created base64 tokens from directory`);
+          return tokens;
+        }
       }
 
       logger.warn('No token files found');

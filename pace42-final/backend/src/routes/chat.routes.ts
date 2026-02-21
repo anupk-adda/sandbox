@@ -10,7 +10,10 @@ import { contextManager } from '../services/context-manager.js';
 import { personaAgent } from '../services/persona-agent.js';
 import { userProfileManager } from '../services/user-profile-manager.js';
 import { trainingPlanService, GoalDistance, PlanSummary, WeeklyDetail, AssistantPrompt } from '../services/training-plan-service.js';
+import { subscriptionService } from '../services/subscription-service.js';
 import { logger } from '../utils/logger.js';
+import { requireQueryAllowance } from '../middleware/subscription-check.js';
+import { subscriptionErrors } from '../utils/subscription-errors.js';
 
 const router = Router();
 
@@ -333,7 +336,7 @@ const buildTrainingSummary = (charts?: any[]): TrainingSummary | undefined => {
  * POST /api/v1/chat
  * Main chat endpoint - receives user message and returns AI response
  */
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/', requireQueryAllowance, async (req: Request, res: Response, next: NextFunction) => {
   logger.info('Chat POST handler called', { body: req.body });
   try {
     const { message, sessionId, location } = req.body as ChatRequest;
@@ -634,6 +637,28 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
       let summary: PlanSummary;
       let week: WeeklyDetail;
+
+      const planAllowance = subscriptionService.canCreatePlan(userId);
+      if (!planAllowance.allowed) {
+        const requestId = (req as any).requestId;
+        const response: ChatResponse = {
+          response: subscriptionErrors.planLimit.error,
+          sessionId: conversationId,
+          intent: 'training_plan',
+          requiresGarminData: false,
+          agent: 'Plan Coach',
+          confidence: 0.85,
+        };
+        return res.status(subscriptionErrors.planLimit.status).json({
+          ...response,
+          code: subscriptionErrors.planLimit.code,
+          tier: planAllowance.tier,
+          limit: planAllowance.limit,
+          activePlans: planAllowance.activePlans,
+          upgradeRequired: true,
+          requestId,
+        });
+      }
       try {
         const profileContext = userProfileManager.getUserProfileContext(userId);
         const agentPlan = await agentClient.generateTrainingPlan({
@@ -1043,7 +1068,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
  * POST /api/v1/chat/fetch-runs
  * Fetch additional run data for dynamic range selection
  */
-router.post('/fetch-runs', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/fetch-runs', requireQueryAllowance, async (req: Request, res: Response, next: NextFunction) => {
   logger.info('Fetch runs POST handler called', { body: req.body });
   try {
     const { count, sessionId } = req.body as { count: number; sessionId?: string };

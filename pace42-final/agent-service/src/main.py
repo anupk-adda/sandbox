@@ -5,11 +5,13 @@ FastAPI application for LangGraph-based multi-agent coaching system
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import uvicorn
 from datetime import datetime, timedelta
 import logging
+import uuid
 
 # Import configuration
 from .config import load_config
@@ -36,6 +38,41 @@ app.add_middleware(
     allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
+
+
+# Error response helper
+def error_response(
+    request: Request,
+    code: str,
+    message: str,
+    status_code: int,
+    details: Optional[Dict[str, Any]] = None
+) -> JSONResponse:
+    """
+    Standardized error response matching backend format
+    """
+    request_id = request.headers.get('x-request-id', str(uuid.uuid4()))
+    
+    error_body = {
+        "error": {
+            "code": code,
+            "message": message,
+            "statusCode": status_code,
+            "requestId": request_id
+        }
+    }
+    
+    if details:
+        error_body["error"]["details"] = details
+    
+    logger.error(f"Error: {code} - {message}", extra={
+        "requestId": request_id,
+        "statusCode": status_code,
+        "code": code
+    })
+    
+    return JSONResponse(status_code=status_code, content=error_body)
+
     allow_headers=["*"],
 )
 
@@ -124,7 +161,7 @@ async def health_check():
 
 # Reset Garmin MCP client endpoint (called when user disconnects Garmin)
 @app.post("/reset-garmin-client")
-async def reset_garmin_client_endpoint():
+async def reset_garmin_client_endpoint(request: Request):
     """
     Reset the Garmin MCP client singleton
     
@@ -132,8 +169,17 @@ async def reset_garmin_client_endpoint():
     to ensure a fresh connection is established on next use.
     """
     try:
+        user_id = request.headers.get('X-User-ID')
+
         from .mcp.garmin_client_async import reset_garmin_client
         reset_garmin_client()
+
+        if user_id:
+            from .mcp.garmin_client_v2 import clear_client_for_user, clear_token_store_for_user
+            clear_client_for_user(user_id)
+            clear_token_store_for_user(user_id)
+            logger.info(f"Cleared user-scoped Garmin client and token store for user {user_id}")
+
         logger.info("Garmin MCP client reset successfully")
         return {"status": "success", "message": "Garmin client reset successfully"}
     except Exception as e:

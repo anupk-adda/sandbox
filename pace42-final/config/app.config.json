@@ -53,7 +53,7 @@
       "name": "garmin-mcp",
       "command": "/Users/anupk/devops/mcp/garmin_mcp/.venv/bin/python",
       "args": [
-        "/Users/anupk/devops/mcp/garmin_mcp/garmin_mcp_server.py"
+        "/Users/anupk/devops/sandbox/Kimi_Agent_pac42/pace42-final/mcp/garmin_mcp_wrapper.py"
       ],
       "timeout": 30000,
       "retries": 3,
