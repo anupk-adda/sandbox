@@ -38,6 +38,8 @@ app.add_middleware(
     allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Error response helper
@@ -72,9 +74,6 @@ def error_response(
     })
     
     return JSONResponse(status_code=status_code, content=error_body)
-
-    allow_headers=["*"],
-)
 
 # Request/Response models
 class RunActivity(BaseModel):

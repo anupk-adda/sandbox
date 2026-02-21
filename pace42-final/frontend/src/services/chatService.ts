@@ -28,6 +28,8 @@ export interface ChatResponse {
   requiresGarminData: boolean;
   agent?: string;
   confidence: number;
+  analysisSummary?: string;
+  analysisFull?: string;
   charts?: Chart[];
   runSamples?: RunSamplePayload[];
   weather?: WeatherPayload;
@@ -61,7 +63,7 @@ export interface ChartSeries {
 
 export interface Chart {
   id: string;
-  type: 'line';
+  type: 'line' | 'bar';
   title: string;
   xLabels: string[];
   yLabel?: string;

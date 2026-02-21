@@ -6,10 +6,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { chatService, SubscriptionError } from '../services/chatService';
 import { authService } from '../services/authService';
-import type { Message, WeatherPayload, PlanSummary, WeeklyDetail, AssistantPrompt, TrainingSummary, RunSamplePayload } from '../services/chatService';
+import type { Message, WeatherPayload, PlanSummary, WeeklyDetail, AssistantPrompt, TrainingSummary, RunSamplePayload, Chart } from '../services/chatService';
 import { RunningConditionsWidget } from '../features/weather/RunningConditionsWidget';
 import type { HourlyWeather } from '../features/weather/weatherUtils';
 import { RunAnalysisInlineCard } from '../features/run-analysis/RunAnalysisInlineCard';
+import { AnalysisCharts } from '../features/run-analysis/AnalysisCharts';
 import type { RunSample } from '../features/run-analysis/runAnalysisUtils';
 import { Logo } from './auth/Logo';
 import { UpgradePrompt } from './UpgradePrompt';
@@ -51,6 +52,9 @@ type ChatMessage = Message & {
   weeklyDetail?: WeeklyDetail;
   trainingSummary?: TrainingSummary;
   prompts?: AssistantPrompt[];
+  charts?: Chart[];
+  analysisSummary?: string;
+  analysisFull?: string;
   intent?: string;
 };
 
@@ -97,6 +101,27 @@ const extractHighlights = (content: string): string[] => {
   return lines.slice(0, 8).map(cleanText);
 };
 
+const extractObservationBullets = (summary?: string): string[] => {
+  if (!summary) return [];
+  const lines = summary
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  const labeled = lines.filter(line => /:/.test(line));
+  const source = labeled.length ? labeled : summary.split(/[.!?]\s+/).map(line => line.trim()).filter(Boolean);
+  return source.slice(0, 5).map(cleanText);
+};
+
+const buildDetailLines = (details?: string): string[] => {
+  if (!details) return [];
+  return details
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(cleanText);
+};
+
 export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -117,6 +142,7 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [upgradePromptType, setUpgradePromptType] = useState<'plan' | 'query'>('query');
   const [upgradePromptData, setUpgradePromptData] = useState<any>(null);
+  const [planSubscribeLoading, setPlanSubscribeLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -226,6 +252,9 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
         weeklyDetail: response.weeklyDetail,
         trainingSummary: response.trainingSummary,
         prompts: response.prompts,
+        charts: response.charts,
+        analysisSummary: response.analysisSummary,
+        analysisFull: response.analysisFull,
         intent: response.intent,
       };
       if (response.prompts !== undefined) {
@@ -298,6 +327,13 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
     }, 100);
   };
 
+  useEffect(() => {
+    const pending = sessionStorage.getItem('pendingPrompt');
+    if (!pending) return;
+    sessionStorage.removeItem('pendingPrompt');
+    handleQuickPrompt(pending);
+  }, []);
+
   const handlePromptAction = (prompt: AssistantPrompt) => {
     if (prompt.action === 'track_training') {
       handleQuickPrompt('Track my training');
@@ -319,6 +355,35 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
       handleQuickPrompt('Reschedule');
       return;
     }
+    if (action === 'adjust_plan') {
+      handleQuickPrompt('Adjust plan');
+      return;
+    }
+  };
+
+  const handlePlanSubscribe = async (planId?: string) => {
+    if (planSubscribeLoading) return;
+    setPlanSubscribeLoading(true);
+    const success = await chatService.setSubscription(true);
+    if (success) {
+      setMessages(prev => prev.map(message => {
+        if (!message.planSummary || (planId && message.planSummary.planId !== planId)) return message;
+        return {
+          ...message,
+          planSummary: {
+            ...message.planSummary,
+            isSubscribed: true,
+          },
+        };
+      }));
+      try {
+        const { prompts } = await chatService.fetchActivePlan();
+        if (prompts) setAssistantPrompts(prompts);
+      } catch (err) {
+        console.error('Failed to refresh plan prompts', err);
+      }
+    }
+    setPlanSubscribeLoading(false);
   };
 
   const handleLogout = () => {
@@ -435,6 +500,18 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
             ))}
           </div>
         </div>
+        {!plan.isSubscribed && (
+          <div className="mt-4 rounded-lg border border-[#00D4AA]/30 bg-[#00D4AA]/10 p-3 text-sm text-white/70 flex items-center justify-between gap-3">
+            <span>Subscribe to track this plan and unlock progress insights.</span>
+            <button
+              onClick={() => handlePlanSubscribe(plan.planId)}
+              disabled={planSubscribeLoading}
+              className="px-3 py-1.5 bg-[#00D4AA] text-black text-xs font-semibold rounded-lg hover:bg-[#00D4AA]/90 disabled:opacity-60"
+            >
+              {planSubscribeLoading ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </div>
+        )}
         <div className="flex gap-2 mt-4">
           {plan.actions.map(action => (
             <button
@@ -443,7 +520,15 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
               disabled={isLoading}
               className="flex-1 py-2 px-3 bg-[#00D4AA]/20 hover:bg-[#00D4AA]/30 text-[#00D4AA] text-sm rounded-lg transition-colors"
             >
-              {action === 'show_full_plan' ? 'Full plan' : action === 'edit_goal' ? 'Edit goal' : 'Reschedule'}
+              {action === 'show_full_plan'
+                ? 'Full plan'
+                : action === 'edit_goal'
+                ? 'Edit goal'
+                : action === 'reschedule'
+                ? 'Reschedule'
+                : action === 'adjust_plan'
+                ? 'Adjust plan'
+                : action}
             </button>
           ))}
         </div>
@@ -599,8 +684,12 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
                 const hourlyWeather = mapWeatherToHourly(message.weather);
                 const shouldShowWeather = Boolean(message.weather) || message.intent === 'weather';
                 const runSamples = mapRunSamples(message.runSamples);
-                const isAnalysis = /(^|\n)##?\s/.test(message.content);
+                const isAnalysis = Boolean(message.analysisSummary || message.analysisFull || message.charts?.length || runSamples.length);
                 const highlights = extractHighlights(message.content);
+                const observationBullets = extractObservationBullets(message.analysisSummary);
+                const detailLines = buildDetailLines(message.analysisFull || message.content);
+                const chartList = message.charts || [];
+                const displayCharts = chartList.slice(0, 1);
 
                 if (!isAnalysis && !hasPlanContent) {
                   return (
@@ -635,25 +724,19 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
                       />
                     )}
                     
-                    {isAnalysis && highlights.length > 0 && (
+                    {isAnalysis && (
                       <div className="glass-card p-4 mb-4">
                         <h4 className="text-[#00D4AA] font-semibold mb-3 flex items-center gap-2">
                           <Target className="w-4 h-4" />
-                          Coach Focus
+                          Coach Observations
                         </h4>
                         <div className="space-y-2">
-                          {highlights.map((item, idx) => {
-                            const splitIndex = item.indexOf(':');
-                            const hasLabel = splitIndex > -1 && splitIndex < 32;
-                            const label = hasLabel ? item.slice(0, splitIndex) : null;
-                            const value = hasLabel ? item.slice(splitIndex + 1).trim() : item;
-                            return (
-                              <div key={idx} className="flex gap-2 text-sm">
-                                {label && <span className="text-[#00D4AA] whitespace-nowrap">{label}:</span>}
-                                <span className="text-white/70">{value}</span>
-                              </div>
-                            );
-                          })}
+                          {(observationBullets.length ? observationBullets : highlights).slice(0, 5).map((item, idx) => (
+                            <div key={idx} className="flex gap-2 text-sm">
+                              <span className="text-[#00D4AA]">•</span>
+                              <span className="text-white/70">{item}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -661,18 +744,23 @@ export function Chat({ isGarminConnected = false, garminUsername }: ChatProps) {
                     {runSamples.length > 0 && (
                       <RunAnalysisInlineCard samples={runSamples} />
                     )}
+
+                    {displayCharts.length > 0 && runSamples.length === 0 && (
+                      <AnalysisCharts charts={displayCharts} />
+                    )}
                     
-                    {isAnalysis && (
-                      <details className="glass-card">
-                        <summary className="p-4 cursor-pointer text-white/60 hover:text-white text-sm">
-                          Full analysis
-                        </summary>
-                        <div className="p-4 pt-0 text-white/70 text-sm whitespace-pre-line">
-                          {dedupeLines(message.content.split('\n'))
-                            .map(line => cleanText(line.replace(/^#+\s*/, '')))
-                            .join('\n')}
+                    {isAnalysis && detailLines.length > 0 && (
+                      <div className="glass-card p-4">
+                        <h4 className="text-white/80 font-semibold mb-3">Full Description</h4>
+                        <div className="space-y-2 text-sm text-white/70">
+                          {detailLines.map((line, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <span className="text-white/40">{idx + 1}.</span>
+                              <span>{line}</span>
+                            </div>
+                          ))}
                         </div>
-                      </details>
+                      </div>
                     )}
                   </div>
                 );

@@ -6,6 +6,7 @@ import {
   DEFAULT_PRIMARY_METRIC,
   DEFAULT_SECONDARY_METRIC,
   METRICS,
+  isMetricAvailable,
   type MetricId,
 } from './runAnalysisUtils';
 import { buildMockRunSamples } from './mockRunData';
@@ -18,6 +19,10 @@ export default function RunAnalysisPage() {
   const [xAxis, setXAxis] = useState<'time' | 'distance'>('time');
 
   const samples = useMemo(() => buildMockRunSamples(), [id]);
+  const availableMetrics = useMemo(() => {
+    if (!samples.length) return METRICS;
+    return METRICS.filter((metric) => isMetricAvailable(samples, metric));
+  }, [samples]);
 
   return (
     <div className="run-analysis">
@@ -54,13 +59,13 @@ export default function RunAnalysisPage() {
           <MetricPicker
             label="Primary metric"
             value={primaryMetric}
-            options={METRICS}
+            options={availableMetrics}
             onChange={(next) => setPrimaryMetric(next || DEFAULT_PRIMARY_METRIC)}
           />
           <MetricPicker
             label="Secondary metric"
             value={secondaryMetric}
-            options={METRICS.filter((metric) => metric.id !== primaryMetric)}
+            options={availableMetrics.filter((metric) => metric.id !== primaryMetric)}
             allowNone
             onChange={(next) => setSecondaryMetric(next)}
           />

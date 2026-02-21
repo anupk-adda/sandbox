@@ -3,7 +3,7 @@
  * Handles user authentication, password reset, and secure credential management
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { databaseService } from '../services/database/database-service.js';

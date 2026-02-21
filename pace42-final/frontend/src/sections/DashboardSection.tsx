@@ -6,6 +6,8 @@ interface DashboardSectionProps {
   onBack: () => void;
 }
 
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:3000';
+
 export function DashboardSection({ onBack }: DashboardSectionProps) {
   const [plan, setPlan] = useState<PlanSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
       
       // Fetch tier and usage info
       try {
-        const response = await fetch('/api/v1/subscription/status', {
+        const response = await fetch(`${BACKEND_API_URL}/api/v1/subscription/status`, {
           credentials: 'include',
         });
         if (response.ok) {
@@ -57,12 +59,25 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
     }
   };
 
-  const handleSubscribeToggle = async () => {
-    const newStatus = !isSubscribed;
+  const handleSubscribeToggle = async (nextStatus?: boolean) => {
+    const newStatus = typeof nextStatus === 'boolean' ? nextStatus : !isSubscribed;
     const success = await chatService.setSubscription(newStatus);
     if (success) {
       setIsSubscribed(newStatus);
+      await loadDashboardData();
     }
+  };
+
+  const handleDashboardAction = (action: string) => {
+    const promptMap: Record<string, string> = {
+      show_full_plan: 'Show full plan',
+      edit_goal: 'Edit goal',
+      reschedule: 'Reschedule',
+      adjust_plan: 'Adjust plan',
+    };
+    const prompt = promptMap[action] || action;
+    sessionStorage.setItem('pendingPrompt', prompt);
+    window.location.hash = '#/chat';
   };
 
   if (loading) {
@@ -137,7 +152,7 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
               {isSubscribed ? 'Subscribed' : 'Not Subscribed'}
             </span>
             <button
-              onClick={handleSubscribeToggle}
+              onClick={() => handleSubscribeToggle()}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 isSubscribed
                   ? 'bg-white/10 text-white hover:bg-white/20'
@@ -217,65 +232,96 @@ export function DashboardSection({ onBack }: DashboardSectionProps) {
           </div>
         </div>
 
-        {/* Weekly Schedule */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">This Week's Schedule</h3>
-          
-          <div className="space-y-3">
-            {plan.nextWorkouts.map((workout, idx) => (
-              <div 
-                key={idx}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    idx === 0 
-                      ? 'bg-[#00D4AA]/20 text-[#00D4AA]' 
-                      : 'bg-white/10 text-white/40'
-                  }`}>
-                    {idx === 0 ? <Circle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
-                  </div>
-                  <div>
-                    <div className="font-medium text-white">{workout.name}</div>
-                    <div className="text-sm text-white/50">
-                      {new Date(workout.date).toLocaleDateString('en-US', { 
-                        weekday: 'long',
-                        month: 'short', 
-                        day: 'numeric' 
-                      })}
+        {!isSubscribed && (
+          <div className="glass-card p-6 mt-6">
+            <h3 className="text-lg font-semibold text-white mb-2">Subscribe to Track Progress</h3>
+            <p className="text-white/60 mb-4">
+              Your plan is ready. Subscribe to unlock weekly schedule details and progress tracking.
+            </p>
+            <button
+              onClick={() => handleSubscribeToggle(true)}
+              className="px-5 py-2 bg-[#00D4AA] text-black font-semibold rounded-lg hover:bg-[#00D4AA]/90 transition-colors"
+            >
+              Subscribe & Track
+            </button>
+          </div>
+        )}
+
+        {isSubscribed && (
+          <>
+            {/* Weekly Schedule */}
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">This Week's Schedule</h3>
+              
+              <div className="space-y-3">
+                {plan.nextWorkouts.map((workout, idx) => (
+                  <div 
+                    key={idx}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        idx === 0 
+                          ? 'bg-[#00D4AA]/20 text-[#00D4AA]' 
+                          : 'bg-white/10 text-white/40'
+                      }`}>
+                        {idx === 0 ? <Circle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <div className="font-medium text-white">{workout.name}</div>
+                        <div className="text-sm text-white/50">
+                          {new Date(workout.date).toLocaleDateString('en-US', { 
+                            weekday: 'long',
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        workout.effort === 'easy' ? 'bg-green-500/20 text-green-400' :
+                        workout.effort === 'moderate' ? 'bg-yellow-500/20 text-yellow-400' :
+                        workout.effort === 'hard' ? 'bg-orange-500/20 text-orange-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>
+                        {workout.effort}
+                      </span>
+                      <ChevronRight className="w-5 h-5 text-white/30" />
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    workout.effort === 'easy' ? 'bg-green-500/20 text-green-400' :
-                    workout.effort === 'moderate' ? 'bg-yellow-500/20 text-yellow-400' :
-                    workout.effort === 'hard' ? 'bg-orange-500/20 text-orange-400' :
-                    'bg-red-500/20 text-red-400'
-                  }`}>
-                    {workout.effort}
-                  </span>
-                  <ChevronRight className="w-5 h-5 text-white/30" />
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Actions */}
-        <div className="mt-6 flex gap-4">
-          {plan.actions.map((action, idx) => (
-            <button
-              key={idx}
-              className="flex-1 glass-card p-4 text-left hover:bg-white/10 transition-colors group"
-            >
-              <div className="text-white font-medium group-hover:text-[#00D4AA] transition-colors">
-                {action}
-              </div>
-            </button>
-          ))}
-        </div>
+            {/* Actions */}
+            <div className="mt-6 flex gap-4">
+              {plan.actions.map((action, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleDashboardAction(action)}
+                  className="flex-1 glass-card p-4 text-left hover:bg-white/10 transition-colors group"
+                >
+                  <div className="text-white font-medium group-hover:text-[#00D4AA] transition-colors">
+                    {action}
+                  </div>
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  // TODO: Implement edit plan modal/flow
+                  alert('Edit plan feature - coming soon');
+                }}
+                className="flex-1 glass-card p-4 text-left hover:bg-white/10 transition-colors group"
+              >
+                <div className="text-white font-medium group-hover:text-[#00D4AA] transition-colors">
+                  Edit Plan
+                </div>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

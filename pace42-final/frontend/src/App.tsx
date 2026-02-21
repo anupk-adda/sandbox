@@ -103,7 +103,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/chat" element={<AuthFlow />} />
-        <Route path="/dashboard" element={<TrainingDashboard onBack={() => window.location.href = '/chat'} />} />
+        <Route path="/dashboard" element={<TrainingDashboard onBack={() => { window.location.hash = '#/chat'; }} />} />
         <Route path="/conditions/running" element={<RunningConditionsPage />} />
         <Route path="/run/analysis/:id" element={<RunAnalysisPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

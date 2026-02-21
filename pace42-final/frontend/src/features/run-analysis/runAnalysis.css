@@ -88,13 +88,21 @@
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 20px;
-  padding: 18px;
+  padding: 18px 18px 14px;
   position: relative;
 }
 
 .run-chart__canvas {
   position: relative;
   overflow: visible;
+}
+
+.run-chart__normalized {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(226, 232, 240, 0.45);
+  margin-bottom: 8px;
 }
 
 .run-chart__empty {
@@ -138,6 +146,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+}
+
+.run-chart__tooltip-row--muted {
+  color: rgba(226, 232, 240, 0.6);
+  font-size: 0.75rem;
 }
 
 .run-chart__tooltip-dot {

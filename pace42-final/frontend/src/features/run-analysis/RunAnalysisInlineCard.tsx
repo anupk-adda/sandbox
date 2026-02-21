@@ -5,6 +5,7 @@ import {
   DEFAULT_PRIMARY_METRIC,
   DEFAULT_SECONDARY_METRIC,
   METRICS,
+  isMetricAvailable,
   type MetricId,
   type RunSample,
 } from './runAnalysisUtils';
@@ -20,9 +21,7 @@ export const RunAnalysisInlineCard = ({ samples }: RunAnalysisInlineCardProps) =
 
   const availableMetrics = useMemo(() => {
     if (!samples.length) return METRICS;
-    return METRICS.filter((metric) =>
-      samples.some((sample) => sample.metrics[metric.id] !== null && sample.metrics[metric.id] !== undefined)
-    );
+    return METRICS.filter((metric) => isMetricAvailable(samples, metric));
   }, [samples]);
 
   return (

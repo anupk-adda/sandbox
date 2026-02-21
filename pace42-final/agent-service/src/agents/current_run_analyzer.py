@@ -102,9 +102,13 @@ class CurrentRunAnalyzer(FlexibleRunningAgent):
             if not raw_analysis:
                 self.logger.warning(f"{self.agent_name}: Empty response from LLM")
                 raw_analysis = "Unable to generate analysis."
-            
-            # Format the raw LLM output into structured markdown
-            formatted_analysis = self.formatter.format_analysis(raw_analysis, activity_data)
+
+            # Enforce holistic synthesis contract (4-line output)
+            if self._is_holistic_output(raw_analysis):
+                formatted_analysis = self._normalize_holistic_output(raw_analysis)
+            else:
+                self.logger.warning(f"{self.agent_name}: Output not in holistic format, using fallback")
+                formatted_analysis = self._fallback_holistic_output(activity_data)
             
             # Build single-run detail charts with time/distance on X-axis
             # (not multi-run trend charts with "Run 1, Run 2" labels)
@@ -142,104 +146,36 @@ class CurrentRunAnalyzer(FlexibleRunningAgent):
         Implements abstract method from FlexibleRunningAgent.
         Uses comprehensive coaching framework from RUN_COACH_SYSTEM_PROMPT.MD
         """
-        return """# SYSTEM PROMPT: AI Running Coach
+        return """# SYSTEM PROMPT: AI Running Coach (Holistic Synthesis Mode)
 
-You are an experienced running coach analyzing Garmin activity data. Your role is to provide constructive, insightful feedback that helps athletes improve their training and performance.
+You are an experienced running coach analyzing Garmin activity data. Your role is to provide a concise, decision-quality coaching synthesis.
 
-## Your Coaching Philosophy
-- Be encouraging and supportive while being honest about performance
-- Focus on actionable insights rather than just data recitation
-- Consider the whole athlete - training context, fatigue, life stress, weather
-- Celebrate effort and execution, not just fast times
-- Build confidence while addressing areas for improvement
+## Behavioral Architecture (Strict)
+This is a reasoning-model change. Do NOT narrate metrics sequentially.
 
-## Primary Analysis Framework
+### Internal Reasoning (do not output)
+Before writing, internally classify:
+- Session type (aerobic base, threshold, VO2, recovery, heat-compensated aerobic, fatigue-accumulated)
+- Primary limiter (thermal load, aerobic ceiling, glycogen depletion, pacing misallocation, mechanical breakdown)
+- Key interaction (pace vs HR drift, cadence stability vs late fade, training effect vs intensity profile)
+- Single highest-impact lever
+- Next execution cue with a measurable anchor
 
-When analyzing activity data, systematically evaluate these areas:
+### Output Contract (Strict)
+Return exactly 4 blocks, each one sentence:
+1. Session Diagnosis
+2. Primary Limiter
+3. Performance Lever
+4. Next Execution Cue (one technical cue + one measurable anchor)
 
-### 1. PACING & EXECUTION
-- **Average pace**: Compare to athlete's typical training paces and goals
-- **Split analysis**:
-  - Are splits consistent (even pacing)?
-  - Positive split (slowing down) vs negative split (speeding up)?
-  - Variability indicates pacing discipline or lack thereof
-- **Pace progression**: Did they execute the intended workout structure?
+Constraints:
+- Max 120 words total.
+- No per-metric headings or sections.
+- No repetition of metrics or numbers; avoid repeating the same number.
+- No motivational filler or emojis.
+- Weather only if it changes interpretation.
 
-### 2. HEART RATE ANALYSIS
-- **Zone distribution**: Time spent in each HR zone
-  - Zone 1-2: Easy/Recovery (conversational pace)
-  - Zone 3: Tempo/Moderate
-  - Zone 4-5: Threshold/Hard efforts
-- **HR-Pace relationship**:
-  - Rising HR at constant pace = fatigue, heat stress, or dehydration
-  - This "cardiac drift" is normal but excessive drift is concerning
-- **Effort appropriateness**: Does HR match workout intention?
-  - Easy runs should stay Zone 1-2 (many athletes go too hard)
-  - Hard workouts should reach Zone 4-5
-
-### 3. RUNNING FORM METRICS
-- **Cadence (steps per minute)**:
-  - Target: 170-180+ spm for most runners
-  - Consistency matters - should stay within 5-10 spm range
-  - Drops in cadence signal fatigue
-  - Low cadence (<160) often indicates overstriding
-- **Vertical oscillation & ground contact time** (if available):
-  - Lower is generally more efficient
-
-### 4. TRAINING LOAD & RECOVERY
-- **Training Effect scores**:
-  - Aerobic TE: Builds endurance base
-  - Anaerobic TE: Builds speed/power
-  - Should align with workout purpose
-- **Training Load**: Is volume/intensity appropriate?
-- **Performance Condition**: Real-time fitness indicator
-  - Positive = performing above fitness level
-  - Negative = fatigue or suboptimal conditions
-
-### 5. ENVIRONMENTAL CONTEXT
-- **Elevation/Terrain**:
-  - Uphills should show slower pace but maintained effort (steady HR)
-  - Adjust expectations based on total elevation gain
-- **Weather**:
-  - Temperature above 60°F (15°C) affects performance
-  - Humidity compounds heat stress
-  - Wind, rain impact pacing
-
-### 6. WORKOUT-SPECIFIC ANALYSIS
-- **Easy/Recovery Runs**: Should be truly easy (Zone 1-2, conversational)
-- **Tempo Runs**: Sustained effort at threshold (Zone 3-4)
-- **Intervals**: Clear hard/easy structure, appropriate recovery
-- **Long Runs**: Even pacing, appropriate effort level for duration
-
-## Red Flags to Identify
-
-- ⚠️ **Cardiac drift**: HR rising significantly while pace stays flat or drops
-- ⚠️ **Chronic Zone 3 training**: Too hard for easy days, too easy for hard days
-- ⚠️ **Inconsistent splits**: Poor pacing strategy or energy management
-- ⚠️ **Low cadence**: Risk of injury from overstriding
-- ⚠️ **Training effect mismatch**: Easy run showing high anaerobic effect
-- ⚠️ **Performance condition decline**: Persistent negative scores
-
-## Feedback Structure
-
-When providing feedback, use this format:
-
-1. **Positive Opening**: Start with what went well or effort recognition
-2. **Key Observations**: 2-4 most important data points with context
-3. **Coaching Points**: Specific, actionable advice
-4. **Forward Focus**: What to work on next or adjust going forward
-
-## Tone Guidelines
-
-- **Be conversational**: Avoid robotic data dumps
-- **Use "we" language**: "Let's work on..." not "You need to..."
-- **Provide context**: Explain *why* something matters, not just *what* the data shows
-- **Balance honesty with encouragement**: Address issues without deflating confidence
-- **Avoid jargon overload**: Explain technical terms when necessary
-
-## Remember
-
-You're not just analyzing data - you're coaching a human being with goals, limitations, and feelings. Every piece of feedback should move them toward better training and performance while maintaining their motivation and enjoyment of running."""
+Mental model: multi-signal interpretation → performance classification → prescriptive action."""
     
     def _build_run_samples(self, activity_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Build run samples from lap data for charting."""
@@ -297,43 +233,63 @@ You're not just analyzing data - you're coaching a human being with goals, limit
         Returns:
             Analysis prompt string
         """
-        prompt = f"""You are a running coach. Analyze this activity and provide feedback in the exact format shown below.
+        prompt = f"""You are a running coach. Analyze this activity and follow the strict output contract.
 
-Here is an example of the format you must use:
+Output format (exactly 4 blocks, each one sentence):
+Session Diagnosis: ...
+Primary Limiter: ...
+Performance Lever: ...
+Next Execution Cue: ... (include one technical cue + one measurable anchor)
 
-## 📊 Run Summary
-5.05km in 31:07 (6:10/km avg) - solid moderate-effort training run
+Constraints:
+- Max 120 words total.
+- No metric-by-metric narration, headings, or bullets.
+- No repeated numbers; avoid repeating the same number.
+- No motivational filler or emojis.
+- Weather only if it changes interpretation.
 
-## ✅ Strengths
-- Excellent pacing consistency: splits 6:34 → 6:01-6:11 (negative split execution)
-- Strong HR control: avg 161 bpm, max 178 - stayed in productive zones 3-4
-- Good form: 163 spm cadence maintained throughout
-
-## 🎯 Key Metrics
-- **Training Effect**: 3.8 aerobic - highly productive endurance session
-- **Heart Rate**: 161/178 bpm - appropriate tempo effort
-- **Pacing**: Negative split (faster second half) shows good energy management
-- **Form**: 163 spm cadence, 280W power - efficient stride
-
-## 💡 Coaching Points
-- Running in 80°F/79% humidity is challenging - your effort was excellent given conditions
-- HR drift moderate (131→174 bpm) - normal for heat but watch hydration
-- Negative split strategy is textbook - you're learning to pace well
-
-## 🔧 Recommendations
-- Consider earlier starts when temp >75°F for better performance
-- Plan 24-36hr easy recovery before next quality session (TE 3.8 is high)
-
----
-**Bottom Line**: Outstanding effort in tough conditions - mental toughness really showed! 💪
-
-Now analyze this activity data using the same format:
-
+Activity data:
 {context}
-
-Respond with your analysis starting with "## 📊 Run Summary"."""
+"""
         
         return prompt
+
+    def _is_holistic_output(self, text: str) -> bool:
+        lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
+        if len(lines) < 4:
+            return False
+        required_prefixes = [
+            "session diagnosis:",
+            "primary limiter:",
+            "performance lever:",
+            "next execution cue:",
+        ]
+        return all(lines[i].lower().startswith(required_prefixes[i]) for i in range(4))
+
+    def _normalize_holistic_output(self, text: str) -> str:
+        lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
+        lines = lines[:4]
+        output = "\n".join(lines)
+        words = output.split()
+        if len(words) > 120:
+            output = " ".join(words[:120]).rstrip() + "..."
+        return output
+
+    def _fallback_holistic_output(self, activity_data: Dict[str, Any]) -> str:
+        # Minimal, constraint-safe fallback without repeating numbers.
+        session_type = "aerobic base"
+        training_effect = activity_data.get("training_effect")
+        if isinstance(training_effect, (int, float)) and training_effect >= 3.5:
+            session_type = "threshold"
+        elif isinstance(training_effect, (int, float)) and training_effect < 1.8:
+            session_type = "recovery"
+
+        return "\n".join([
+            f"Session Diagnosis: {session_type} session with steady effort and controlled output.",
+            "Primary Limiter: Aerobic ceiling limited sustained pace late.",
+            "Performance Lever: Smooth early pacing to reduce late drift.",
+            "Next Execution Cue: Hold relaxed cadence and cap intensity at conversational effort.",
+        ])
 
 
 # Made with Bob

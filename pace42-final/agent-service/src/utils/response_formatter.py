@@ -29,6 +29,10 @@ class RunAnalysisFormatter:
         Returns:
             Formatted markdown string
         """
+        # If the model already returned a holistic synthesis, preserve it.
+        if self._is_holistic_output(raw_text):
+            return self._normalize_holistic_output(raw_text)
+
         # Extract key information from raw text
         parsed = self._parse_raw_text(raw_text)
         
@@ -36,6 +40,28 @@ class RunAnalysisFormatter:
         formatted = self._build_formatted_output(parsed, activity_data)
         
         return formatted
+
+    def _is_holistic_output(self, text: str) -> bool:
+        lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
+        if len(lines) < 4:
+            return False
+        required_prefixes = [
+            "session diagnosis:",
+            "primary limiter:",
+            "performance lever:",
+            "next execution cue:",
+        ]
+        return all(lines[i].lower().startswith(required_prefixes[i]) for i in range(4))
+
+    def _normalize_holistic_output(self, text: str) -> str:
+        lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
+        lines = lines[:4]
+        output = "\n".join(lines)
+        # Enforce soft 120-word cap without breaking labels.
+        words = output.split()
+        if len(words) > 120:
+            output = " ".join(words[:120]).rstrip() + "..."
+        return output
     
     def _parse_raw_text(self, text: str) -> Dict[str, Any]:
         """Parse raw text to extract key points."""

@@ -25,6 +25,40 @@ class CoachQAAgent:
         self.conversation_history: List[Dict[str, str]] = []
         self.planner_prompt = self._build_planner_prompt()
         logger.info("Initialized CoachQAAgent")
+
+    def _detect_follow_up(self, question: str, context: Optional[Dict[str, Any]]) -> bool:
+        if not context:
+            return False
+        recent_messages = context.get("recent_messages")
+        if not isinstance(recent_messages, list) or len(recent_messages) == 0:
+            return False
+        lower_q = question.lower().strip()
+        followup_starters = (
+            "and", "also", "what about", "how about", "then", "so", "now", "ok", "okay", "sure"
+        )
+        if any(lower_q.startswith(starter) for starter in followup_starters):
+            return True
+        if len(lower_q.split()) <= 6:
+            return True
+        if any(token in lower_q for token in ("that", "it", "this", "those", "same", "instead")):
+            return True
+        if context.get("last_intent") or context.get("summary") or context.get("last_analysis_text"):
+            return len(lower_q.split()) <= 10
+        return False
+
+    def _format_recent_turns(self, context: Optional[Dict[str, Any]]) -> List[str]:
+        if not context:
+            return []
+        recent_messages = context.get("recent_messages")
+        if not isinstance(recent_messages, list) or not recent_messages:
+            return []
+        lines: List[str] = []
+        for msg in recent_messages[-6:]:
+            role = msg.get("role", "user")
+            content = str(msg.get("content", ""))[:220]
+            if content:
+                lines.append(f"{role.title()}: {content}")
+        return lines
     
     async def answer_question(
         self,
@@ -236,6 +270,9 @@ Rules:
             reason = "Defaulted to answer."
 
         if context:
+            if self._detect_follow_up(question, context) and action != "decline_non_running":
+                action = "answer"
+                reason = "Follow-up question with context."
             has_running_context = bool(context.get("last_intent") or context.get("last_analysis_text") or context.get("summary"))
             if has_running_context:
                 keywords = (
@@ -307,6 +344,10 @@ Communication style:
 - Provide context and reasoning
 - Break down complex concepts
 - Be honest about uncertainties
+- Treat follow-up questions as continuations; reference the last advice briefly before expanding.
+- If clarification is required, ask only one focused question.
+- Do not restate entire prior answers; build on them.
+- For “next run” requests, look at recent run history and propose a balanced week: include a base/aerobic run, one quality session (tempo or VO2), one long run, and easy/recovery days. Avoid stacking high intensity if recent runs were strenuous.
 
 Critical instruction:
 - For common training questions (easy/tempo pace, expected race time, training load, next run),
@@ -327,13 +368,25 @@ Confidence line:
         """Build user prompt with question and context"""
         
         prompt_parts = []
-        
-        # Add conversation history if exists
+
+        follow_up = self._detect_follow_up(question, context)
+        if follow_up:
+            prompt_parts.append("## Follow-up Context")
+            prompt_parts.append("Treat this as a follow-up; anchor to the prior advice unless the user changes topic.")
+            prompt_parts.append("")
+
+        recent_turns = self._format_recent_turns(context)
+        if recent_turns:
+            prompt_parts.append("## Conversation Memory")
+            prompt_parts.extend(recent_turns)
+            prompt_parts.append("")
+
+        # Add conversation history if exists (agent-local)
         if self.conversation_history:
-            prompt_parts.append("## Previous Conversation")
-            for exchange in self.conversation_history[-3:]:  # Last 3 exchanges
+            prompt_parts.append("## Agent Memory")
+            for exchange in self.conversation_history[-3:]:
                 prompt_parts.append(f"Q: {exchange['question']}")
-                prompt_parts.append(f"A: {exchange['answer'][:200]}...")
+                prompt_parts.append(f"A: {exchange['answer'][:180]}...")
             prompt_parts.append("")
         
         # Add analysis context if provided
@@ -344,14 +397,6 @@ Confidence line:
             if summary:
                 prompt_parts.append("**Session Summary:**")
                 prompt_parts.append(summary)
-
-            recent_messages = context.get("recent_messages")
-            if isinstance(recent_messages, list) and recent_messages:
-                prompt_parts.append("\n**Recent Messages:**")
-                for msg in recent_messages[-4:]:
-                    role = msg.get("role", "user")
-                    content = msg.get("content", "")
-                    prompt_parts.append(f"- {role}: {content[:200]}")
 
             last_analysis_text = context.get("last_analysis_text")
             if last_analysis_text:

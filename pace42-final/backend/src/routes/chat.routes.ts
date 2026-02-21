@@ -38,6 +38,8 @@ interface ChatResponse {
   requiresGarminData: boolean;
   agent?: string;
   confidence: number;
+  analysisSummary?: string;
+  analysisFull?: string;
   charts?: any[];
   runSamples?: any[];
   weather?: any;
@@ -133,6 +135,7 @@ type PlanDraft = {
   goalDistance?: GoalDistance;
   goalDate?: string;
   daysPerWeek?: number;
+  mode?: 'create' | 'edit' | 'adjust';
 };
 
 type TrainingSummary = {
@@ -256,6 +259,7 @@ const isPlanCreationSignal = (message: string, draft: PlanDraft): boolean => {
     || isConfirmUnsubscribe(message)
     || isCancelUnsubscribe(message)
     || isEditGoal(message)
+    || isAdjustPlan(message)
     || isReschedulePlan(message)
   ) {
     return false;
@@ -267,6 +271,7 @@ const isPlanCreationSignal = (message: string, draft: PlanDraft): boolean => {
 const isShowFullPlan = (message: string): boolean => /\b(show|see|view)\b.*\b(full plan|weekly plan|week plan)\b/i.test(message);
 const isTrackTraining = (message: string): boolean => /\btrack my training\b/i.test(message);
 const isEditGoal = (message: string): boolean => /\bedit goal\b/i.test(message);
+const isAdjustPlan = (message: string): boolean => /\b(adjust|modify|update|change)\b.*\bplan\b/i.test(message);
 const isReschedulePlan = (message: string): boolean => /\breschedule\b/i.test(message);
 const isSubscribePlan = (message: string): boolean => /\bsubscribe\b/i.test(message);
 const isUnsubscribePlan = (message: string): boolean => /\bunsubscribe\b/i.test(message);
@@ -288,6 +293,50 @@ const buildPlanMissingPrompt = (draft: PlanDraft): string => {
   return `Great. What is your ${missing.join(', and ')}?`;
 };
 
+const computePlanAdjustmentSuggestion = (runSamples?: Array<{ metrics?: Record<string, any> }>): string | null => {
+  if (!Array.isArray(runSamples) || runSamples.length < 6) return null;
+  const paceValues = runSamples
+    .map(sample => sample.metrics?.pace)
+    .filter((value): value is number => Number.isFinite(value as number));
+  const hrValues = runSamples
+    .map(sample => sample.metrics?.heartRate)
+    .filter((value): value is number => Number.isFinite(value as number));
+
+  if (paceValues.length < 6 || hrValues.length < 6) return null;
+
+  const segment = Math.max(2, Math.floor(Math.min(paceValues.length, hrValues.length) * 0.3));
+  const avg = (values: number[]) => values.reduce((sum, v) => sum + v, 0) / Math.max(1, values.length);
+
+  const earlyPace = avg(paceValues.slice(0, segment));
+  const latePace = avg(paceValues.slice(-segment));
+  const earlyHr = avg(hrValues.slice(0, segment));
+  const lateHr = avg(hrValues.slice(-segment));
+
+  if (!Number.isFinite(earlyPace) || !Number.isFinite(latePace) || earlyPace <= 0) return null;
+
+  const paceSlowPct = ((latePace - earlyPace) / earlyPace) * 100;
+  const hrDelta = lateHr - earlyHr;
+
+  if (paceSlowPct > 6 && hrDelta > 6) {
+    if (paceSlowPct > 12 || hrDelta > 12) {
+      return 'Noticeable late-run fade with rising effort. Consider reducing intensity or adding recovery to keep quality consistent.';
+    }
+    return 'Late-run fade suggests the load may be a bit high. A small intensity or volume adjustment could keep you fresher.';
+  }
+  return null;
+};
+
+const mergePrompts = (base: AssistantPrompt[] = [], extras: AssistantPrompt[] = []): AssistantPrompt[] => {
+  const seen = new Set<string>();
+  const merged: AssistantPrompt[] = [];
+  [...base, ...extras].forEach(prompt => {
+    if (seen.has(prompt.id)) return;
+    seen.add(prompt.id);
+    merged.push(prompt);
+  });
+  return merged.sort((a, b) => a.priority - b.priority);
+};
+
 const formatPlanIntro = (summary: PlanSummary): string => {
   const nextWorkout = summary.nextWorkouts[0];
   const nextLine = nextWorkout ? `Next run: ${nextWorkout.name} (${nextWorkout.effort})` : '';
@@ -298,6 +347,70 @@ const formatPlanIntro = (summary: PlanSummary): string => {
       : summary.goalDistance.toUpperCase();
   return `Here’s your ${goalLabel} plan for ${summary.goalDate}. ` +
     `Current phase: ${summary.phase}. Focus this week: ${summary.weeklyFocus}. ${nextLine}`.trim();
+};
+
+const normalizeAnalysisLine = (line: string): string => {
+  return line
+    .replace(/^[\s>*#-]+/, '')
+    .replace(/^\d+\.\s+/, '')
+    .replace(/\*\*/g, '')
+    .replace(/`/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const shouldSkipAnalysisLine = (line: string): boolean => {
+  const lowered = line.toLowerCase();
+  const skipPhrases = [
+    'recent training pattern',
+    'key observations',
+    'next workout recommendation',
+    'important notes',
+    'training pattern',
+  ];
+  return skipPhrases.some(phrase => lowered === phrase);
+};
+
+const buildAnalysisSummary = (analysisText?: string): string | undefined => {
+  if (!analysisText) return undefined;
+  const rawLines = analysisText.split('\n').map(line => line.trim()).filter(Boolean);
+  const bulletLines = rawLines.filter(line => /^[-•]/.test(line));
+  const labeledLines = rawLines.filter(line => /:/.test(line));
+  let source = bulletLines.length ? bulletLines : labeledLines.length ? labeledLines : rawLines;
+  if (!source.length) {
+    source = analysisText.split(/[.!?]\s+/).map(line => line.trim()).filter(Boolean);
+  }
+  const cleaned = source.map(normalizeAnalysisLine).filter(Boolean);
+  const filtered = cleaned.filter(line => !shouldSkipAnalysisLine(line));
+  return filtered.slice(0, 5).join('\n');
+};
+
+const buildAnalysisFull = (charts?: any[], fallback?: string): string | undefined => {
+  const lines: string[] = [];
+  if (fallback) {
+    const summaryLines = fallback
+      .split('\n')
+      .map(normalizeAnalysisLine)
+      .filter(Boolean)
+      .filter(line => !shouldSkipAnalysisLine(line));
+    summaryLines.forEach((line) => {
+      lines.push(line);
+    });
+  }
+  if (Array.isArray(charts)) {
+    charts.forEach(chart => {
+      const title = chart?.title ? String(chart.title) : undefined;
+      const note = chart?.note ? String(chart.note) : undefined;
+      if (title && note) {
+        lines.push(`${title}: ${note}`);
+      } else if (note) {
+        lines.push(note);
+      }
+    });
+  }
+  if (lines.length) return lines.join('\n');
+  if (fallback) return fallback.trim();
+  return undefined;
 };
 
 const formatPace = (value?: number): string | undefined => {
@@ -561,9 +674,35 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
     }
 
     if (isEditGoal(normalizedMessage)) {
-      planDrafts.set(conversationId, {});
+      const defaults = trainingPlanService.getActivePlanSettings(userId);
+      planDrafts.set(conversationId, {
+        goalDistance: defaults?.goalDistance,
+        goalDate: defaults?.goalDate,
+        daysPerWeek: defaults?.daysPerWeek,
+        mode: 'edit',
+      });
       const response: ChatResponse = {
-        response: 'Sure. What is your new goal distance and target race date?',
+        response: 'Sure. What should we adjust—goal distance, target date, or days per week?',
+        sessionId: conversationId,
+        intent: 'training_plan',
+        requiresGarminData: false,
+        agent: 'Plan Coach',
+        confidence: 0.7,
+      };
+      contextManager.recordMessage(conversationId, 'assistant', response.response);
+      return res.json(response);
+    }
+
+    if (isAdjustPlan(normalizedMessage)) {
+      const defaults = trainingPlanService.getActivePlanSettings(userId);
+      planDrafts.set(conversationId, {
+        goalDistance: defaults?.goalDistance,
+        goalDate: defaults?.goalDate,
+        daysPerWeek: defaults?.daysPerWeek,
+        mode: 'adjust',
+      });
+      const response: ChatResponse = {
+        response: 'Got it. Tell me what to change for your plan (goal, date, or days per week).',
         sessionId: conversationId,
         intent: 'training_plan',
         requiresGarminData: false,
@@ -592,6 +731,7 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
       goalDistance: activePlanDraft?.goalDistance || extractedPlanInfo.goalDistance,
       goalDate: activePlanDraft?.goalDate || extractedPlanInfo.goalDate,
       daysPerWeek: activePlanDraft?.daysPerWeek || extractedPlanInfo.daysPerWeek,
+      mode: activePlanDraft?.mode,
     };
     const shouldStartPlanFlow = Boolean(planDraft) || isPlanCreationSignal(normalizedMessage, planSignalDraft);
 
@@ -618,6 +758,7 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
         goalDistance: planDraft?.goalDistance || extractedPlanInfo.goalDistance,
         goalDate: planDraft?.goalDate || extractedPlanInfo.goalDate,
         daysPerWeek: planDraft?.daysPerWeek || extractedPlanInfo.daysPerWeek,
+        mode: planDraft?.mode,
       };
 
       if (!nextDraft.goalDistance || !nextDraft.goalDate || !nextDraft.daysPerWeek) {
@@ -638,7 +779,11 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
       let summary: PlanSummary;
       let week: WeeklyDetail;
 
-      const planAllowance = subscriptionService.canCreatePlan(userId);
+      const activePlanId = trainingPlanService.getActivePlanForUser(userId);
+      const allowReplace = Boolean(activePlanId) && (planDraft?.mode === 'edit' || planDraft?.mode === 'adjust');
+      const planAllowance = allowReplace
+        ? { allowed: true, activePlans: 1, limit: 1, tier: subscriptionService.getTierStatus(userId).tier }
+        : subscriptionService.canCreatePlan(userId);
       if (!planAllowance.allowed) {
         const requestId = (req as any).requestId;
         const response: ChatResponse = {
@@ -843,6 +988,8 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
       const canUseCache = cached && (!chartIntents.has(intent.type) || (Array.isArray(cachedCharts) && cachedCharts.length > 0));
 
       if (canUseCache) {
+        const summaryText = buildAnalysisSummary(cached.analysis_text);
+        const fullText = buildAnalysisFull(cachedCharts, cached.analysis_text);
         const response: ChatResponse = {
           response: cached.analysis_text,
           sessionId: conversationId,
@@ -852,6 +999,8 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
           confidence: intent.confidence,
           charts: cachedCharts,
           runSamples: cached?.analysis_payload?.run_samples || cached?.analysis_payload?.runSamples,
+          analysisSummary: summaryText,
+          analysisFull: fullText,
         };
 
         contextManager.recordMessage(conversationId, 'assistant', response.response);
@@ -907,6 +1056,26 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
           charts: analysis.charts || analysis.chart_data,
           runSamples: analysis.run_samples || analysis.runSamples,
         };
+        response.analysisSummary = buildAnalysisSummary(analysis.analysis || analysis.raw_analysis);
+        response.analysisFull = buildAnalysisFull(response.charts, analysis.raw_analysis || analysis.analysis);
+
+        const activePlanId = trainingPlanService.getActivePlanForUser(userId);
+        const isSubscribed = trainingPlanService.isUserSubscribed(userId);
+        if (activePlanId && isSubscribed && response.runSamples && intent.type === 'last_run') {
+          const suggestion = computePlanAdjustmentSuggestion(response.runSamples as any[]);
+          if (suggestion) {
+            response.response = `${response.response}\n\nPlan Adjustment Suggestion: ${suggestion}`;
+            const basePrompts = trainingPlanService.getPromptsForUser(userId);
+            response.prompts = mergePrompts(basePrompts, [
+              {
+                id: 'adjust_plan',
+                label: 'Adjust my plan',
+                action: 'adjust_plan',
+                priority: 1,
+              },
+            ]);
+          }
+        }
 
         contextManager.recordMessage(conversationId, 'assistant', response.response);
         const analysisPayload: Record<string, any> = {};
@@ -991,9 +1160,28 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
           sessionId: conversationId,
         });
 
+        const nextRunSignal = /\b(next run|recommend my next run|what should i run)\b/i.test(message);
+        let recentRunsContext: any = undefined;
+        let lastRunSamples: any[] | undefined = undefined;
+        if (nextRunSignal) {
+          try {
+            const recentRunsAnalysis = await agentClient.analyzeRecentRuns(userId);
+            if (recentRunsAnalysis?.analysis) {
+              recentRunsContext = recentRunsAnalysis.analysis;
+            }
+            const lastRunAnalysis = await agentClient.analyzeLastRun(userId);
+            lastRunSamples = lastRunAnalysis?.run_samples || lastRunAnalysis?.runSamples;
+          } catch (error) {
+            logger.warn('Failed to fetch recent runs for next run context', { error });
+          }
+        }
+
         if (personalized) {
+          const mergedContext = recentRunsContext
+            ? { ...fullyEnrichedContext, recent_runs_comparison: recentRunsContext }
+            : fullyEnrichedContext;
           logger.info('Routing to Coach Q&A Agent with context');
-          analysis = await agentClient.askCoachWithContext(message, fullyEnrichedContext, undefined, {
+          analysis = await agentClient.askCoachWithContext(message, mergedContext, undefined, {
             force_answer: coachable,
           });
           agentUsed = 'Coach Q&A Agent - Context Aware';
@@ -1028,6 +1216,11 @@ router.post('/', requireQueryAllowance, async (req: Request, res: Response, next
           confidence: intent.confidence,
           charts: analysis.charts || analysis.chart_data,
         };
+        if (nextRunSignal && lastRunSamples && (!response.runSamples || response.runSamples.length === 0)) {
+          response.runSamples = lastRunSamples;
+        }
+        response.analysisSummary = buildAnalysisSummary(response.response);
+        response.analysisFull = buildAnalysisFull(response.charts, response.response);
 
         contextManager.recordMessage(conversationId, 'assistant', response.response);
         contextManager.recordAnalysis(

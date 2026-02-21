@@ -579,6 +579,48 @@ class TrainingPlanService {
     return { summary, week };
   }
 
+  updatePlan(planId: string, updates: { goalDate?: string; daysPerWeek?: number; phase?: string }): PlanSummary {
+    this.ensureSchema();
+
+    const plan = databaseService.get<{ id: string; user_id: string; goal_distance: GoalDistance }>(
+      `SELECT id, user_id, goal_distance FROM training_plans WHERE id = ?`,
+      [planId]
+    );
+
+    if (!plan) {
+      throw new Error('Plan not found');
+    }
+
+    const updateFields: string[] = [];
+    const updateValues: any[] = [];
+
+    if (updates.goalDate) {
+      updateFields.push('goal_date = ?');
+      updateValues.push(updates.goalDate);
+    }
+
+    if (updates.daysPerWeek) {
+      updateFields.push('days_per_week = ?');
+      updateValues.push(updates.daysPerWeek);
+    }
+
+    if (updates.phase) {
+      updateFields.push('current_phase = ?');
+      updateValues.push(updates.phase);
+    }
+
+    if (updateFields.length > 0) {
+      updateValues.push(planId);
+      databaseService.run(
+        `UPDATE training_plans SET ${updateFields.join(', ')} WHERE id = ?`,
+        updateValues
+      );
+      logger.info('Training plan updated', { planId, updates });
+    }
+
+    return this.getPlanSummary(planId);
+  }
+
   getPlanSummary(planId: string): PlanSummary {
     this.ensureSchema();
 
@@ -647,8 +689,34 @@ class TrainingPlanService {
       personalizationReason,
       isSubscribed: this.isUserSubscribed(plan.user_id),
       nextWorkouts,
-      actions: ['show_full_plan', 'edit_goal', 'reschedule'],
+      actions: ['show_full_plan', 'edit_goal', 'reschedule', 'adjust_plan'],
     };
+  }
+
+  getPlanSettings(planId: string): { goalDistance: GoalDistance; goalDate: string; daysPerWeek: number } | null {
+    this.ensureSchema();
+    const plan = databaseService.get<{
+      goal_distance: GoalDistance;
+      goal_date: string;
+      days_per_week: number | null;
+    }>(
+      `SELECT goal_distance, goal_date, days_per_week
+       FROM training_plans
+       WHERE id = ?`,
+      [planId]
+    );
+    if (!plan) return null;
+    return {
+      goalDistance: plan.goal_distance,
+      goalDate: plan.goal_date,
+      daysPerWeek: plan.days_per_week || 0,
+    };
+  }
+
+  getActivePlanSettings(userId: string): { goalDistance: GoalDistance; goalDate: string; daysPerWeek: number } | null {
+    const activePlanId = this.getActivePlanForUser(userId);
+    if (!activePlanId) return null;
+    return this.getPlanSettings(activePlanId);
   }
 
   getActivePlanForUser(userId: string): string | null {

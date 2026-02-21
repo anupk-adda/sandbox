@@ -154,3 +154,63 @@ p50: 0.001674s, p95: 0.002733s, status: 200
 
 **Checkpoint created:** 2026-02-21  
 **Checkpoint updated:** 2026-02-21
+
+---
+
+# Addendum: Agent Behavior Changes (Phases 1–4)
+
+**Date:** 2026-02-21  
+**Status:** ✅ Complete (Phases 1–4)
+
+## Summary
+
+Implemented and validated the Agent Behavior Changes roadmap:
+1. Coach agent holistic synthesis output (4-line contract).
+2. Run analysis graph rendering improvements (normalized overlay, efficiency/drift, smoothing, insight zones).
+3. Plan lifecycle completion (subscribe CTA, dashboard gating, plan modification, auto-suggest adjustments).
+4. Contextual Coach Q&A (follow-up handling, memory, interactive continuity).
+
+## Key Changes
+
+**Phase 1 – Coach Agent**
+- Enforced 4-line holistic synthesis output contract and fallback formatting.
+- Validation: 4 lines, ≤120 words, no headings, no metric-by-metric narration.
+
+**Phase 2 – Graph Rendering**
+- Normalized overlay for mixed-units metrics.
+- Derived Efficiency Index + Drift.
+- Smoothing/despike and sampling consolidation.
+- Insight zone bands (stable/warn/fade) + richer tooltips.
+
+**Phase 3 – Plan Lifecycle**
+- Subscribe CTA shown when plan is presented; subscription unlocks dashboard tracking.
+- Plan modification supported (edit/adjust) without plan-limit dead-end.
+- Coach auto-suggests plan adjustments when late-run fade detected.
+
+**Phase 4 – Contextual Q&A**
+- Follow-up detection and session memory in Coach Q&A.
+- Responses reference prior advice without repetition; only one clarifying question when needed.
+
+## Files Updated (Agent Behavior Changes)
+
+- `pace42-final/agent-service/src/agents/current_run_analyzer.py`
+- `pace42-final/agent-service/src/utils/response_formatter.py`
+- `pace42-final/frontend/src/features/run-analysis/runAnalysisUtils.ts`
+- `pace42-final/frontend/src/features/run-analysis/RunCompareChart.tsx`
+- `pace42-final/frontend/src/features/run-analysis/RunAnalysisInlineCard.tsx`
+- `pace42-final/frontend/src/features/run-analysis/RunAnalysisPage.tsx`
+- `pace42-final/frontend/src/features/run-analysis/runAnalysis.css`
+- `pace42-final/backend/src/services/training-plan-service.ts`
+- `pace42-final/backend/src/routes/chat.routes.ts`
+- `pace42-final/frontend/src/components/Chat.tsx`
+- `pace42-final/frontend/src/sections/DashboardSection.tsx`
+- `pace42-final/agent-service/src/agents/coach_qa.py`
+
+## Validation
+
+- Phase 1: Holistic synthesis format verified (4-line contract).
+- Phase 2: Derived metrics + drift calculations verified; UI visual validation pending manual browser check.
+- Phase 3: Subscribe CTA, dashboard gating, plan update flow, coach auto-suggest verified.
+- Phase 4: Multi-turn Q&A validated; context retained across follow-ups.
+
+**Checkpoint updated:** 2026-02-21
